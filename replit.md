@@ -7,6 +7,7 @@ This is a full-stack web application that serves as the comprehensive digital hu
 ## User Preferences
 
 Preferred communication style: Simple, everyday language.
+Authentication: User requested removal of all sign-in/sign-up features from the application interface.
 
 ## System Architecture
 
@@ -117,6 +118,9 @@ The application provides comprehensive league management functionality:
 - **Schema Updates**: Added HallOfFameInput type and updated all AI flow functions
 - **Critical Fix**: Resolved mockRoster reference error causing frontend crashes
 - **OpenAI Integration**: Full migration to OpenAI GPT-4o for text generation and DALL-E 3 for image generation
+- **Authentication Removal**: Removed all sign-in/sign-up functionality from header per user request
+- **Player Availability**: Fixed status update functionality with working dialog interface
+- **Header Cleanup**: Streamlined header to show only navigation and dashboard panels
 
 ### Professional Theming
 - **Design**: Professional dark theme with modern aesthetics
