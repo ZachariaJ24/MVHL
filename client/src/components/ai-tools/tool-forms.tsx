@@ -101,9 +101,10 @@ function DraftCommentaryForm({ onSubmit, isLoading }: { onSubmit: (data: DraftCo
   const form = useForm<DraftCommentaryInput>({
     resolver: zodResolver(draftCommentaryInputSchema),
     defaultValues: {
-      player_name: "",
-      pick_number: 1,
-      team_name: "",
+      prospect: "",
+      position: "",
+      team: "",
+      pickNumber: 1,
     },
   });
 
@@ -112,12 +113,12 @@ function DraftCommentaryForm({ onSubmit, isLoading }: { onSubmit: (data: DraftCo
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
         <FormField
           control={form.control}
-          name="player_name"
+          name="prospect"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Player Name</FormLabel>
+              <FormLabel>Prospect Name</FormLabel>
               <FormControl>
-                <Input placeholder="Enter player name" {...field} />
+                <Input placeholder="Enter prospect name" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -125,7 +126,33 @@ function DraftCommentaryForm({ onSubmit, isLoading }: { onSubmit: (data: DraftCo
         />
         <FormField
           control={form.control}
-          name="pick_number"
+          name="position"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Position</FormLabel>
+              <FormControl>
+                <Input placeholder="Enter position" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="team"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Team</FormLabel>
+              <FormControl>
+                <Input placeholder="Enter team name" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="pickNumber"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Pick Number</FormLabel>
@@ -136,19 +163,6 @@ function DraftCommentaryForm({ onSubmit, isLoading }: { onSubmit: (data: DraftCo
                   {...field} 
                   onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
                 />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="team_name"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Team Name</FormLabel>
-              <FormControl>
-                <Input placeholder="Enter team name" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -169,8 +183,8 @@ function NewsRecapForm({ onSubmit, isLoading }: { onSubmit: (data: NewsRecapInpu
   const form = useForm<NewsRecapInput>({
     resolver: zodResolver(newsRecapInputSchema),
     defaultValues: {
-      entityType: "team",
-      entityName: "",
+      gameResults: "",
+      keyPlayers: "",
     },
   });
 
@@ -179,33 +193,25 @@ function NewsRecapForm({ onSubmit, isLoading }: { onSubmit: (data: NewsRecapInpu
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
         <FormField
           control={form.control}
-          name="entityType"
+          name="gameResults"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Entity Type</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
-                <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select entity type" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  <SelectItem value="league">League</SelectItem>
-                  <SelectItem value="team">Team</SelectItem>
-                </SelectContent>
-              </Select>
+              <FormLabel>Game Results</FormLabel>
+              <FormControl>
+                <Textarea placeholder="Enter game results..." {...field} />
+              </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
         <FormField
           control={form.control}
-          name="entityName"
+          name="keyPlayers"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Entity Name</FormLabel>
+              <FormLabel>Key Players</FormLabel>
               <FormControl>
-                <Input placeholder="Enter name" {...field} />
+                <Textarea placeholder="Enter key players information..." {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>

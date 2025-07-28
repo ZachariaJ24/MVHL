@@ -136,7 +136,7 @@ export function AdminDashboard() {
   });
 
   const deleteUserMutation = useMutation({
-    mutationFn: (userId: string) => apiRequest(`/api/admin/users/${userId}`, "DELETE"),
+    mutationFn: (userId: string) => apiRequest("DELETE", `/api/admin/users/${userId}`),
     onSuccess: () => {
       toast({ title: "User deleted successfully" });
       queryClient.invalidateQueries({ queryKey: ["/api/admin/users"] });
@@ -145,7 +145,7 @@ export function AdminDashboard() {
 
   const changeUserRoleMutation = useMutation({
     mutationFn: ({ userId, role }: { userId: string; role: string }) => 
-      apiRequest(`/api/admin/users/${userId}/role`, "PUT", { role }),
+      apiRequest("PUT", `/api/admin/users/${userId}/role`, { role }),
     onSuccess: () => {
       toast({ title: "User role updated successfully" });
       queryClient.invalidateQueries({ queryKey: ["/api/admin/users"] });
@@ -154,7 +154,7 @@ export function AdminDashboard() {
 
   const userManagementMutation = useMutation({
     mutationFn: (data: z.infer<typeof userManagementSchema>) => 
-      apiRequest(`/api/admin/users/${data.userId}`, "PUT", { 
+      apiRequest("PUT", `/api/admin/users/${data.userId}`, { 
         roles: data.roles, 
         teamId: data.teamId === "none" ? null : data.teamId 
       }),

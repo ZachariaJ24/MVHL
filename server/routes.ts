@@ -211,6 +211,18 @@ export function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.put("/api/admin/users/:id/role", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { role } = req.body;
+      const user = await storage.updateUser(id, { role });
+      res.json(user);
+    } catch (error) {
+      console.error("Error updating user role:", error);
+      res.status(500).json({ error: "Failed to update user role" });
+    }
+  });
+
   app.delete("/api/admin/users/:id", async (req, res) => {
     try {
       const { id } = req.params;
@@ -219,6 +231,121 @@ export function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error deleting user:", error);
       res.status(500).json({ error: "Failed to delete user" });
+    }
+  });
+
+  // Player availability routes
+  app.get("/api/player-availability", async (req, res) => {
+    try {
+      const { teamId } = req.query;
+      const availability = await storage.getPlayerAvailability(teamId as string);
+      res.json(availability);
+    } catch (error) {
+      console.error("Error fetching player availability:", error);
+      res.status(500).json({ error: "Failed to fetch player availability" });
+    }
+  });
+
+  app.put("/api/player-availability/:playerId", async (req, res) => {
+    try {
+      const { playerId } = req.params;
+      const { status, reason, estimatedReturn } = req.body;
+      
+      const availability = await storage.updatePlayerAvailability(playerId, {
+        isAvailable: status === 'available',
+        availabilityNote: reason || null,
+        // For now, we'll store the status and estimatedReturn in the note
+        status,
+        estimatedReturn
+      });
+      
+      res.json(availability);
+    } catch (error) {
+      console.error("Error updating player availability:", error);
+      res.status(500).json({ error: "Failed to update player availability" });
+    }
+  });
+
+  // Team lineup routes
+  app.get("/api/teams/:teamId/lineup", async (req, res) => {
+    try {
+      const { teamId } = req.params;
+      const { gameId } = req.query;
+      const lineup = await storage.getTeamLineup(teamId, gameId as string);
+      res.json(lineup);
+    } catch (error) {
+      console.error("Error fetching team lineup:", error);
+      res.status(500).json({ error: "Failed to fetch team lineup" });
+    }
+  });
+
+  app.put("/api/teams/:teamId/lineup", async (req, res) => {
+    try {
+      const { teamId } = req.params;
+      const { lineup, playerAvailability, gameId } = req.body;
+      
+      const lineupData = await storage.updateTeamLineup(teamId, {
+        lineup,
+        playerAvailability,
+        gameId: gameId || null,
+        isActive: true,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      });
+      
+      res.json(lineupData);
+    } catch (error) {
+      console.error("Error updating team lineup:", error);
+      res.status(500).json({ error: "Failed to update team lineup" });
+    }
+  });
+
+  // Image management routes
+  app.get("/api/images", async (req, res) => {
+    try {
+      const images = await storage.getAllImages();
+      res.json(images);
+    } catch (error) {
+      console.error("Error fetching images:", error);
+      res.status(500).json({ error: "Failed to fetch images" });
+    }
+  });
+
+  app.post("/api/images/upload", async (req, res) => {
+    try {
+      // For now, simulate image upload processing
+      // In production, this would handle actual file uploads to cloud storage
+      const { category, subcategory, title, description, targetEntity, tags } = req.body;
+      
+      const imageData = {
+        id: `img-${Date.now()}`,
+        url: `https://via.placeholder.com/300x200?text=${encodeURIComponent(title || 'Image')}`,
+        category: category || 'general',
+        subcategory: subcategory || 'misc',
+        title: title || 'Uploaded Image',
+        description: description || '',
+        targetEntity: targetEntity || null,
+        tags: Array.isArray(tags) ? tags : [],
+        uploadedAt: new Date(),
+        uploadedBy: 'current-user' // In production, get from session
+      };
+      
+      const savedImage = await storage.createImage(imageData);
+      res.json(savedImage);
+    } catch (error) {
+      console.error("Error uploading image:", error);
+      res.status(500).json({ error: "Failed to upload image" });
+    }
+  });
+
+  app.delete("/api/images/:id", async (req, res) => {
+    try {
+      const { id } = req.params;
+      await storage.deleteImage(id);
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error deleting image:", error);
+      res.status(500).json({ error: "Failed to delete image" });
     }
   });
 
@@ -283,7 +410,7 @@ export function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/content", async (req, res) => {
     try {
-      const content = await storage.saveGeneratedContent(req.body);
+      const content = await storage.createGeneratedContent(req.body);
       res.json(content);
     } catch (error) {
       console.error("Error saving generated content:", error);

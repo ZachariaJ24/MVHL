@@ -172,19 +172,46 @@ export function Stats() {
         </TabsList>
 
         <TabsContent value="forwards">
-          <StatTable
-            players={getTopForwards()}
-            title="Forward Stats (C, RW, LW)"
-            columns={[
-              { key: "gamesPlayed", label: "GP" },
-              { key: "goals", label: "G" },
-              { key: "assists", label: "A" },
-              { key: "points", label: "PTS" },
-              { key: "plusMinus", label: "+/-" },
-              { key: "sog", label: "SOG" },
-              { key: "hits", label: "HITS" },
-            ]}
-          />
+          <Card>
+            <CardHeader>
+              <CardTitle>Forward Stats (C, RW, LW)</CardTitle>
+            </CardHeader>
+            <CardContent>
+              {getTopForwards().length > 0 ? (
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Player</TableHead>
+                      <TableHead>Team</TableHead>
+                      <TableHead>GP</TableHead>
+                      <TableHead>G</TableHead>
+                      <TableHead>A</TableHead>
+                      <TableHead>PTS</TableHead>
+                      <TableHead>+/-</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {getTopForwards().map((player: any) => (
+                      <TableRow key={player.id}>
+                        <TableCell className="font-medium">{player.name}</TableCell>
+                        <TableCell>{teams?.find((t: any) => t.id === player.teamId)?.abbreviation || '-'}</TableCell>
+                        <TableCell>{player.gamesPlayed || 0}</TableCell>
+                        <TableCell>{player.goals || 0}</TableCell>
+                        <TableCell>{player.assists || 0}</TableCell>
+                        <TableCell className="font-bold">{player.points || 0}</TableCell>
+                        <TableCell>{player.plusMinus || 0}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              ) : (
+                <div className="text-center py-8">
+                  <Trophy className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+                  <p className="text-muted-foreground">No forward statistics available</p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
         </TabsContent>
 
         <TabsContent value="defense">

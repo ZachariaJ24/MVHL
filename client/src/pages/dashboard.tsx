@@ -1,5 +1,5 @@
-import Header from "@/components/layout/header";
-import Footer from "@/components/layout/footer";
+import { Header } from "@/components/layout/header";
+import { Footer } from "@/components/layout/footer";
 import AIToolsPanel from "@/components/ai-tools/ai-tools-panel";
 import Sidebar from "@/components/sidebar/sidebar";
 

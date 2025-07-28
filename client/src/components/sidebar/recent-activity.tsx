@@ -3,8 +3,15 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { formatDistanceToNow } from "date-fns";
 
+interface Activity {
+  id: string;
+  title: string;
+  type: string;
+  createdAt: string;
+}
+
 export default function RecentActivity() {
-  const { data: activities, isLoading } = useQuery({
+  const { data: activities, isLoading } = useQuery<Activity[]>({
     queryKey: ["/api/activity"],
   });
 
@@ -52,7 +59,7 @@ export default function RecentActivity() {
       <CardContent>
         <div className="space-y-3">
           {activities && activities.length > 0 ? (
-            activities.map((activity: any) => (
+            activities.map((activity: Activity) => (
               <div key={activity.id} className="flex items-start space-x-3">
                 <div className={`w-2 h-2 rounded-full mt-2 ${getActivityColor(activity.type)}`}></div>
                 <div>

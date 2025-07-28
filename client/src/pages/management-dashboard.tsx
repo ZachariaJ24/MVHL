@@ -18,6 +18,7 @@ import { z } from "zod";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/use-auth";
+import { SalaryBreakdown } from "@/components/team/salary-breakdown";
 
 const tradeOfferSchema = z.object({
   offeredPlayer: z.string().min(1, "Please select a player to offer"),
@@ -38,6 +39,8 @@ export function ManagementDashboard() {
   const [selectedOffer, setSelectedOffer] = useState<any>(null);
   const [chatMessage, setChatMessage] = useState("");
   const [chelLookupResult, setChelLookupResult] = useState<any>(null);
+  const [lineup, setLineup] = useState<{[position: string]: string}>({});
+  const [playerAvailability, setPlayerAvailability] = useState<{[playerId: string]: boolean}>({});
   const { user } = useAuth();
   const { toast } = useToast();
 
@@ -55,6 +58,42 @@ export function ManagementDashboard() {
 
   const { data: draftProspects } = useQuery({
     queryKey: ["/api/draft/prospects/available"],
+  });
+
+  // Mutations
+  const saveLineupMutation = useMutation({
+    mutationFn: async (lineupData: any) => {
+      const response = await apiRequest("PUT", `/api/teams/${userTeam.id}/lineup`, lineupData);
+      return await response.json();
+    },
+    onSuccess: () => {
+      toast({
+        title: "Lineup Saved",
+        description: "Team lineup has been updated successfully",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Save Failed",
+        description: error?.message || "Failed to save lineup",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const updatePlayerAvailabilityMutation = useMutation({
+    mutationFn: async (data: { playerId: string; isAvailable: boolean }) => {
+      const response = await apiRequest("PUT", `/api/player-availability/${data.playerId}`, {
+        status: data.isAvailable ? 'available' : 'unavailable'
+      });
+      return await response.json();
+    },
+    onSuccess: () => {
+      toast({
+        title: "Availability Updated",
+        description: "Player availability has been updated",
+      });
+    },
   });
 
   // Get user's team (for demo, use first team - in production this would be based on user's team assignment)
@@ -416,10 +455,22 @@ export function ManagementDashboard() {
                       <div className="flex items-center space-x-2">
                         <Button
                           size="sm"
-                          variant={Math.random() > 0.8 ? "outline" : "default"}
-                          className={Math.random() > 0.8 ? "text-red-600 hover:text-red-700" : "bg-green-600 hover:bg-green-700"}
+                          variant={playerAvailability[player.id] === false ? "outline" : "default"}
+                          className={playerAvailability[player.id] === false ? "text-red-600 hover:text-red-700" : "bg-green-600 hover:bg-green-700"}
+                          onClick={() => {
+                            const newAvailability = !playerAvailability[player.id];
+                            setPlayerAvailability(prev => ({
+                              ...prev,
+                              [player.id]: newAvailability
+                            }));
+                            updatePlayerAvailabilityMutation.mutate({
+                              playerId: player.id,
+                              isAvailable: newAvailability
+                            });
+                          }}
+                          disabled={updatePlayerAvailabilityMutation.isPending}
                         >
-                          {Math.random() > 0.8 ? (
+                          {playerAvailability[player.id] === false ? (
                             <>
                               <X className="h-4 w-4 mr-1" />
                               Unavailable
@@ -586,10 +637,29 @@ export function ManagementDashboard() {
                   </div>
 
                   <div className="flex space-x-2 pt-4">
-                    <Button className="flex-1">
-                      Save Lineup
+                    <Button 
+                      className="flex-1"
+                      onClick={() => {
+                        saveLineupMutation.mutate({
+                          lineup,
+                          playerAvailability
+                        });
+                      }}
+                      disabled={saveLineupMutation.isPending}
+                    >
+                      {saveLineupMutation.isPending ? "Saving..." : "Save Lineup"}
                     </Button>
-                    <Button variant="outline">
+                    <Button 
+                      variant="outline"
+                      onClick={() => {
+                        setLineup({});
+                        setPlayerAvailability({});
+                        toast({
+                          title: "Lineup Reset",
+                          description: "Lineup has been reset to default",
+                        });
+                      }}
+                    >
                       Reset
                     </Button>
                   </div>
@@ -959,12 +1029,11 @@ export function ManagementDashboard() {
               </div>
               
               <div className="mt-6">
-                <h4 className="font-semibold mb-4">Salary Breakdown</h4>
-                <div className="text-center py-8">
-                  <p className="text-muted-foreground">
-                    Detailed salary breakdown will be available in future updates
-                  </p>
-                </div>
+                <SalaryBreakdown 
+                  players={teamRoster}
+                  salaryCap={mockTeam.budget}
+                  salaryCapUsed={mockTeam.salaryCapUsed}
+                />
               </div>
             </CardContent>
           </Card>

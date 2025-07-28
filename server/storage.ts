@@ -67,6 +67,7 @@ export interface IStorage {
   getPlayersByTeam(teamId: string): Promise<Player[]>;
   createPlayer(player: InsertPlayer): Promise<Player>;
   updatePlayer(id: string, updates: Partial<Player>): Promise<Player>;
+  deletePlayer(id: string): Promise<void>;
   
   // Games
   getAllGames(): Promise<Game[]>;
@@ -158,10 +159,12 @@ export interface IStorage {
   // Team Lineup operations
   getTeamLineup(teamId: string, gameId?: string): Promise<any | undefined>;
   createTeamLineup(lineup: any): Promise<any>;
-  updateTeamLineup(id: string, updates: any): Promise<any>;
+  updateTeamLineup(teamId: string, lineupData: any): Promise<any>;
   
   // Player Availability operations
-  getPlayerAvailability(playerId: string, gameId?: string): Promise<any | undefined>;
+  // Player Availability
+  getPlayerAvailability(playerId?: string, gameId?: string): Promise<any[]>;
+  updatePlayerAvailability(playerId: string, data: any): Promise<any>;
   setPlayerAvailability(data: any): Promise<any>;
   getTeamAvailability(teamId: string, gameId?: string): Promise<any[]>;
 
@@ -340,7 +343,12 @@ export class MemStorage implements IStorage {
       isManagement: insertPlayer.isManagement || null,
       gamertag: insertPlayer.gamertag || null,
       bio: insertPlayer.bio || null,
-      availability: insertPlayer.availability || null
+      availability: insertPlayer.availability || null,
+      salary: insertPlayer.salary || null,
+      contractYears: insertPlayer.contractYears || null,
+      injuryStatus: insertPlayer.injuryStatus || null,
+      injuryDescription: insertPlayer.injuryDescription || null,
+      expectedReturn: insertPlayer.expectedReturn || null
     };
     this.players.set(id, player);
     return player;
@@ -352,6 +360,10 @@ export class MemStorage implements IStorage {
     const updatedPlayer = { ...player, ...updates };
     this.players.set(id, updatedPlayer);
     return updatedPlayer;
+  }
+
+  async deletePlayer(id: string): Promise<void> {
+    this.players.delete(id);
   }
 
   // Game methods
@@ -486,12 +498,6 @@ export class MemStorage implements IStorage {
       return allContent.filter(c => c.type === type);
     }
     return allContent.sort((a, b) => 
-      (b.createdAt?.getTime() || 0) - (a.createdAt?.getTime() || 0)
-    );
-  }
-
-  async getAllGeneratedContent(): Promise<GeneratedContent[]> {
-    return Array.from(this.content.values()).sort((a, b) => 
       (b.createdAt?.getTime() || 0) - (a.createdAt?.getTime() || 0)
     );
   }
@@ -702,17 +708,59 @@ export class MemStorage implements IStorage {
     return { ...lineup, id };
   }
 
-  async updateTeamLineup(id: string, updates: any): Promise<any> {
-    return { id, ...updates };
+  async updateTeamLineup(teamId: string, lineupData: any): Promise<any> {
+    // For memory storage, just return the lineup data with an ID
+    return { 
+      id: `lineup-${teamId}`,
+      teamId,
+      ...lineupData,
+      updatedAt: new Date()
+    };
   }
 
-  async getPlayerAvailability(playerId: string, gameId?: string): Promise<any | undefined> {
-    return undefined;
+  async getPlayerAvailability(teamId?: string, gameId?: string): Promise<any[]> {
+    // Return mock data for all players or filtered by team
+    const players = Array.from(this.players.values());
+    const filtered = teamId ? players.filter(p => p.teamId === teamId) : players;
+    
+    return filtered.map(player => ({
+      id: `avail-${player.id}`,
+      playerId: player.id,
+      playerName: player.name,
+      teamId: player.teamId,
+      teamName: this.teams.get(player.teamId || '')?.name || 'Unknown Team',
+      status: player.availability || 'available',
+      reason: null,
+      notes: null,
+      estimatedReturn: null,
+      lastUpdated: new Date().toISOString(),
+      position: player.position
+    }));
+  }
+
+  async updatePlayerAvailability(playerId: string, data: any): Promise<any> {
+    // Update the player's availability status
+    const player = this.players.get(playerId);
+    if (player) {
+      const updatedPlayer = {
+        ...player,
+        availability: data.status || data.isAvailable ? 'available' : 'unavailable'
+      };
+      this.players.set(playerId, updatedPlayer);
+    }
+    
+    return {
+      id: `avail-${playerId}`,
+      playerId,
+      status: data.status,
+      reason: data.reason,
+      estimatedReturn: data.estimatedReturn,
+      updatedAt: new Date().toISOString()
+    };
   }
 
   async setPlayerAvailability(data: any): Promise<any> {
-    const id = randomUUID();
-    return { ...data, id };
+    return this.updatePlayerAvailability(data.playerId, data);
   }
 
   async getTeamAvailability(teamId: string, gameId?: string): Promise<any[]> {
@@ -846,6 +894,10 @@ export class DatabaseStorage implements IStorage {
       .where(eq(players.id, id))
       .returning();
     return player;
+  }
+
+  async deletePlayer(id: string): Promise<void> {
+    await db.delete(players).where(eq(players.id, id));
   }
 
   // Games
@@ -1047,11 +1099,6 @@ export class DatabaseStorage implements IStorage {
         .where(eq(generatedContent.type, type))
         .orderBy(desc(generatedContent.createdAt));
     }
-    return await db.select().from(generatedContent)
-      .orderBy(desc(generatedContent.createdAt));
-  }
-
-  async getAllGeneratedContent(): Promise<GeneratedContent[]> {
     return await db.select().from(generatedContent)
       .orderBy(desc(generatedContent.createdAt));
   }
@@ -1269,50 +1316,107 @@ export class DatabaseStorage implements IStorage {
     return created;
   }
 
-  async updateTeamLineup(id: string, updates: any): Promise<any> {
-    const [lineup] = await db
-      .update(teamLineups)
-      .set({ ...updates, updatedAt: new Date() })
-      .where(eq(teamLineups.id, id))
-      .returning();
-    return lineup;
-  }
-
-  // Player Availability operations
-  async getPlayerAvailability(playerId: string, gameId?: string): Promise<any | undefined> {
-    if (gameId) {
-      const [availability] = await db.select().from(playerAvailability)
-        .where(sql`${playerAvailability.playerId} = ${playerId} AND ${playerAvailability.gameId} = ${gameId}`);
-      return availability || undefined;
+  async updateTeamLineup(teamId: string, lineupData: any): Promise<any> {
+    // First check if there's an existing active lineup for this team
+    const existing = await db.select().from(teamLineups)
+      .where(sql`${teamLineups.teamId} = ${teamId} AND ${teamLineups.isActive} = true AND ${teamLineups.gameId} IS NULL`)
+      .limit(1);
+    
+    if (existing.length > 0) {
+      // Update existing lineup
+      const [updated] = await db
+        .update(teamLineups)
+        .set({ 
+          lineup: lineupData.lineup,
+          playerAvailability: lineupData.playerAvailability,
+          updatedAt: new Date() 
+        })
+        .where(eq(teamLineups.id, existing[0].id))
+        .returning();
+      return updated;
     } else {
-      const [availability] = await db.select().from(playerAvailability)
-        .where(sql`${playerAvailability.playerId} = ${playerId} AND ${playerAvailability.gameId} IS NULL`);
-      return availability || undefined;
+      // Create new lineup
+      const [created] = await db
+        .insert(teamLineups)
+        .values({
+          teamId,
+          lineup: lineupData.lineup,
+          playerAvailability: lineupData.playerAvailability,
+          isActive: true,
+          createdAt: new Date(),
+          updatedAt: new Date()
+        })
+        .returning();
+      return created;
     }
   }
 
-  async setPlayerAvailability(data: any): Promise<any> {
-    // First check if availability already exists
-    const existing = await this.getPlayerAvailability(data.playerId, data.gameId);
+  // Player Availability operations
+  async getPlayerAvailability(teamId?: string, gameId?: string): Promise<any[]> {
+    let query = db
+      .select({
+        id: playerAvailability.id,
+        playerId: playerAvailability.playerId,
+        playerName: players.name,
+        teamId: players.teamId,
+        teamName: teams.name,
+        status: sql<string>`CASE WHEN ${playerAvailability.isAvailable} THEN 'available' ELSE 'unavailable' END`,
+        reason: playerAvailability.availabilityNote,
+        notes: playerAvailability.availabilityNote,
+        estimatedReturn: sql<string>`NULL`,
+        lastUpdated: playerAvailability.submittedAt,
+        position: players.position
+      })
+      .from(playerAvailability)
+      .leftJoin(players, eq(playerAvailability.playerId, players.id))
+      .leftJoin(teams, eq(players.teamId, teams.id));
+
+    if (teamId) {
+      query = query.where(eq(players.teamId, teamId));
+    }
     
-    if (existing) {
+    if (gameId) {
+      query = query.where(eq(playerAvailability.gameId, gameId));
+    } else {
+      query = query.where(sql`${playerAvailability.gameId} IS NULL`);
+    }
+
+    return await query;
+  }
+
+  async updatePlayerAvailability(playerId: string, data: any): Promise<any> {
+    // First check if availability already exists
+    const existing = await db.select().from(playerAvailability)
+      .where(sql`${playerAvailability.playerId} = ${playerId} AND ${playerAvailability.gameId} IS NULL`)
+      .limit(1);
+    
+    if (existing.length > 0) {
       const [updated] = await db
         .update(playerAvailability)
         .set({ 
-          isAvailable: data.isAvailable, 
-          availabilityNote: data.availabilityNote,
+          isAvailable: data.status === 'available', 
+          availabilityNote: data.reason,
           submittedAt: new Date()
         })
-        .where(eq(playerAvailability.id, existing.id))
+        .where(eq(playerAvailability.id, existing[0].id))
         .returning();
       return updated;
     } else {
       const [created] = await db
         .insert(playerAvailability)
-        .values(data)
+        .values({
+          playerId,
+          isAvailable: data.status === 'available',
+          availabilityNote: data.reason,
+          submittedAt: new Date()
+        })
         .returning();
       return created;
     }
+  }
+
+  async setPlayerAvailability(data: any): Promise<any> {
+    return this.updatePlayerAvailability(data.playerId, data);
   }
 
   async getTeamAvailability(teamId: string, gameId?: string): Promise<any[]> {

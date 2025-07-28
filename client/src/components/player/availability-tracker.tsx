@@ -47,17 +47,32 @@ export function AvailabilityTracker({ teamId, showAllTeams = false }: Availabili
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [positionFilter, setPositionFilter] = useState<string>("all");
+  const [editingPlayer, setEditingPlayer] = useState<string | null>(null);
+  const [formData, setFormData] = useState<{
+    status: string;
+    notes: string;
+    estimatedReturn: string;
+  }>({
+    status: "",
+    notes: "",
+    estimatedReturn: ""
+  });
 
   const { data: availability, isLoading } = useQuery({
     queryKey: ["/api/player-availability", teamId],
-    queryFn: () => teamId 
-      ? apiRequest("GET", `/api/player-availability?teamId=${teamId}`)
-      : apiRequest("GET", "/api/player-availability")
+    queryFn: async () => {
+      const response = await apiRequest("GET", teamId 
+        ? `/api/player-availability?teamId=${teamId}`
+        : "/api/player-availability");
+      return await response.json();
+    }
   });
 
   const updateAvailabilityMutation = useMutation({
-    mutationFn: (data: { playerId: string; status: string; reason?: string; estimatedReturn?: string }) =>
-      apiRequest("PUT", `/api/player-availability/${data.playerId}`, data),
+    mutationFn: async (data: { playerId: string; status: string; reason?: string; estimatedReturn?: string }) => {
+      const response = await apiRequest("PUT", `/api/player-availability/${data.playerId}`, data);
+      return await response.json();
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/player-availability"] });
       toast({
@@ -270,7 +285,16 @@ export function AvailabilityTracker({ teamId, showAllTeams = false }: Availabili
                     <div className="mt-3 pt-3 border-t border-border">
                       <div className="flex items-center justify-between text-sm text-muted-foreground">
                         <div>Last updated: {new Date(item.lastUpdated).toLocaleDateString()}</div>
-                        <Dialog>
+                        <Dialog onOpenChange={(open) => {
+                          if (open) {
+                            setFormData({
+                              status: item.status,
+                              notes: item.notes || "",
+                              estimatedReturn: item.estimatedReturn || ""
+                            });
+                            setEditingPlayer(item.playerId);
+                          }
+                        }}>
                           <DialogTrigger asChild>
                             <Button variant="ghost" size="sm">
                               Update Status
@@ -286,7 +310,10 @@ export function AvailabilityTracker({ teamId, showAllTeams = false }: Availabili
                             <div className="space-y-4">
                               <div>
                                 <Label htmlFor="status">Status</Label>
-                                <Select defaultValue={item.status}>
+                                <Select 
+                                  defaultValue={item.status}
+                                  onValueChange={(value) => setFormData({...formData, status: value})}
+                                >
                                   <SelectTrigger>
                                     <SelectValue />
                                   </SelectTrigger>
@@ -303,6 +330,7 @@ export function AvailabilityTracker({ teamId, showAllTeams = false }: Availabili
                                 <Textarea 
                                   placeholder="Add notes about the status update..."
                                   defaultValue={item.notes}
+                                  onChange={(e) => setFormData({...formData, notes: e.target.value})}
                                 />
                               </div>
                               <div>
@@ -310,18 +338,24 @@ export function AvailabilityTracker({ teamId, showAllTeams = false }: Availabili
                                 <Input 
                                   type="date"
                                   defaultValue={item.estimatedReturn}
+                                  onChange={(e) => setFormData({...formData, estimatedReturn: e.target.value})}
                                 />
                               </div>
                               <Button 
                                 className="w-full"
                                 onClick={() => {
-                                  toast({
-                                    title: "Status Updated",
-                                    description: `Updated availability for ${item.playerName}`,
+                                  updateAvailabilityMutation.mutate({
+                                    playerId: item.playerId,
+                                    status: formData.status || item.status,
+                                    reason: formData.notes || item.notes,
+                                    estimatedReturn: formData.estimatedReturn || item.estimatedReturn
                                   });
+                                  setEditingPlayer(null);
+                                  setFormData({ status: "", notes: "", estimatedReturn: "" });
                                 }}
+                                disabled={updateAvailabilityMutation.isPending}
                               >
-                                Update Status
+                                {updateAvailabilityMutation.isPending ? "Updating..." : "Update Status"}
                               </Button>
                             </div>
                           </DialogContent>

@@ -20,7 +20,7 @@ export function MatchesSchedule() {
   const { data: teams } = useQuery({ queryKey: ["/api/teams"] });
   const { data: games } = useQuery({ queryKey: ["/api/games"] });
 
-  // Mock comprehensive match data
+  // Enhanced mock comprehensive match data with better variety
   const mockMatches = [
     {
       id: "1",

@@ -23,6 +23,7 @@ import {
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
+import { type Player } from "@shared/schema";
 
 interface ContractNegotiation {
   id: string;
@@ -53,18 +54,24 @@ export function NegotiationCenter({ teamId, showAllTeams = false }: NegotiationC
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [selectedNegotiation, setSelectedNegotiation] = useState<ContractNegotiation | null>(null);
 
-  const { data: negotiations, isLoading } = useQuery({
+  const { data: negotiations, isLoading } = useQuery<ContractNegotiation[]>({
     queryKey: ["/api/contract-negotiations", teamId],
-    queryFn: () => teamId 
-      ? apiRequest("GET", `/api/contract-negotiations?teamId=${teamId}`)
-      : apiRequest("GET", "/api/contract-negotiations")
+    queryFn: async () => {
+      const response = await apiRequest("GET", teamId 
+        ? `/api/contract-negotiations?teamId=${teamId}`
+        : "/api/contract-negotiations");
+      return await response.json();
+    }
   });
 
-  const { data: players } = useQuery({
+  const { data: players } = useQuery<Player[]>({
     queryKey: ["/api/players", teamId],
-    queryFn: () => teamId 
-      ? apiRequest("GET", `/api/players?teamId=${teamId}`)
-      : apiRequest("GET", "/api/players")
+    queryFn: async () => {
+      const response = await apiRequest("GET", teamId 
+        ? `/api/players?teamId=${teamId}`
+        : "/api/players");
+      return await response.json();
+    }
   });
 
   const createNegotiationMutation = useMutation({
@@ -203,7 +210,7 @@ export function NegotiationCenter({ teamId, showAllTeams = false }: NegotiationC
             <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
               <DialogTrigger asChild>
                 <Button className="bg-green-600 hover:bg-green-700">
-                  <FileContract className="h-4 w-4 mr-2" />
+                  <FileText className="h-4 w-4 mr-2" />
                   Start Negotiation
                 </Button>
               </DialogTrigger>
@@ -224,7 +231,7 @@ export function NegotiationCenter({ teamId, showAllTeams = false }: NegotiationC
                           <SelectValue placeholder="Select player" />
                         </SelectTrigger>
                         <SelectContent>
-                          {(players || []).map((player: any) => (
+                          {(players || []).map((player: Player) => (
                             <SelectItem key={player.id} value={player.id}>
                               {player.name} - {player.position}
                             </SelectItem>
@@ -324,19 +331,19 @@ export function NegotiationCenter({ teamId, showAllTeams = false }: NegotiationC
             </div>
             <div className="text-center">
               <div className="text-2xl font-bold text-green-400">
-                {completedNegotiations.filter(n => n.status === 'approved').length}
+                {completedNegotiations.filter((n: ContractNegotiation) => n.status === 'approved').length}
               </div>
               <div className="text-sm text-muted-foreground">Approved</div>
             </div>
             <div className="text-center">
               <div className="text-2xl font-bold text-red-400">
-                {completedNegotiations.filter(n => n.status === 'rejected').length}
+                {completedNegotiations.filter((n: ContractNegotiation) => n.status === 'rejected').length}
               </div>
               <div className="text-sm text-muted-foreground">Rejected</div>
             </div>
             <div className="text-center">
               <div className="text-2xl font-bold text-yellow-400">
-                {activeNegotiations.filter(n => n.status === 'counter-offer').length}
+                {activeNegotiations.filter((n: ContractNegotiation) => n.status === 'counter-offer').length}
               </div>
               <div className="text-sm text-muted-foreground">Counter Offers</div>
             </div>
@@ -402,7 +409,7 @@ export function NegotiationCenter({ teamId, showAllTeams = false }: NegotiationC
                           {getDaysUntilDeadline(negotiation.deadline)} days remaining
                         </div>
                         <div className="flex items-center gap-1">
-                          <FileContract className="h-4 w-4" />
+                          <FileText className="h-4 w-4" />
                           {negotiation.contractLength} year contract
                         </div>
                       </div>
@@ -437,7 +444,7 @@ export function NegotiationCenter({ teamId, showAllTeams = false }: NegotiationC
                   Start a new contract negotiation to begin
                 </p>
                 <Button onClick={() => setIsCreateDialogOpen(true)}>
-                  <FileContract className="h-4 w-4 mr-2" />
+                  <FileText className="h-4 w-4 mr-2" />
                   Start First Negotiation
                 </Button>
               </CardContent>
@@ -480,7 +487,7 @@ export function NegotiationCenter({ teamId, showAllTeams = false }: NegotiationC
           ) : (
             <Card>
               <CardContent className="p-8 text-center">
-                <FileContract className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+                <FileText className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
                 <h3 className="text-lg font-semibold mb-2">No Completed Negotiations</h3>
                 <p className="text-muted-foreground">
                   Completed contract negotiations will appear here
@@ -493,7 +500,7 @@ export function NegotiationCenter({ teamId, showAllTeams = false }: NegotiationC
         <TabsContent value="templates" className="space-y-4">
           <Card>
             <CardContent className="p-8 text-center">
-              <FileContract className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+              <FileText className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
               <h3 className="text-lg font-semibold mb-2">Contract Templates</h3>
               <p className="text-muted-foreground">
                 Pre-defined contract templates and salary guidelines will be available here
