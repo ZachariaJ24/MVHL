@@ -300,6 +300,55 @@ export function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Image management routes
+  app.get("/api/images", async (req, res) => {
+    try {
+      const images = await storage.getAllImages();
+      res.json(images);
+    } catch (error) {
+      console.error("Error fetching images:", error);
+      res.status(500).json({ error: "Failed to fetch images" });
+    }
+  });
+
+  app.post("/api/images/upload", async (req, res) => {
+    try {
+      // For now, simulate image upload processing
+      // In production, this would handle actual file uploads to cloud storage
+      const { category, subcategory, title, description, targetEntity, tags } = req.body;
+      
+      const imageData = {
+        id: `img-${Date.now()}`,
+        url: `https://via.placeholder.com/300x200?text=${encodeURIComponent(title || 'Image')}`,
+        category: category || 'general',
+        subcategory: subcategory || 'misc',
+        title: title || 'Uploaded Image',
+        description: description || '',
+        targetEntity: targetEntity || null,
+        tags: Array.isArray(tags) ? tags : [],
+        uploadedAt: new Date(),
+        uploadedBy: 'current-user' // In production, get from session
+      };
+      
+      const savedImage = await storage.createImage(imageData);
+      res.json(savedImage);
+    } catch (error) {
+      console.error("Error uploading image:", error);
+      res.status(500).json({ error: "Failed to upload image" });
+    }
+  });
+
+  app.delete("/api/images/:id", async (req, res) => {
+    try {
+      const { id } = req.params;
+      await storage.deleteImage(id);
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error deleting image:", error);
+      res.status(500).json({ error: "Failed to delete image" });
+    }
+  });
+
   // Draft routes
   app.get("/api/draft/picks", async (req, res) => {
     try {
