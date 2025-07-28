@@ -1,0 +1,123 @@
+Hello. Please create a single React component file using Next.js, TypeScript, and ShadCN UI components for an Admin Dashboard.
+
+**File Location:** `src/components/pages/admin-dashboard-client.tsx`
+
+**Component Name:** `AdminDashboardClient`
+
+**Core Requirements:**
+
+1.  **Authentication Check**: The component must first check for a logged-in user from a `useAuth` hook. If the user's role is not 'admin', it must display a permission error and nothing else.
+2.  **Main Layout**:
+    *   The main container should use a standard `div` with container styles from Tailwind CSS.
+    *   It must have a main title "Admin Dashboard" and a welcome message for the logged-in admin user.
+3.  **Tabbed Interface**: The dashboard's core functionality should be organized within a `<Tabs>` component from ShadCN, with the default tab being "user_management".
+
+---
+
+### Tab 1: User Management
+
+*   **Value**: `user_management`
+*   **Trigger Icon**: `Users` from `lucide-react`.
+*   **Content**:
+    *   A `<Card>` containing a form to manage user roles.
+    *   **Fields**:
+        *   A `<Select>` component to choose a user from a list (e.g., player@mvhthub.com, gm@mvhthub.com).
+        *   A group of `<Checkbox>` components for assigning roles (Player, AGM, GM, Owner, Admin).
+        *   A `<Select>` component to assign the user to a specific team.
+    *   **Action**: A "Save User" button that shows a success toast message upon form submission.
+
+---
+
+### Tab 2: Team Management
+
+*   **Value**: `team_management`
+*   **Trigger Icon**: `Shield` from `lucide-react`.
+*   **Content**:
+    *   A `<Card>` with a form for creating or editing teams.
+    *   **Fields**:
+        *   A `<Select>` menu to either choose an existing team to edit or select "-- Create New Team --".
+        *   An `<Input>` for the team's "City".
+        *   An `<Input>` for the team's "Name".
+    *   **Actions**:
+        *   A "Save Team" button that creates a new team or updates an existing one, showing a confirmation toast.
+        *   A "Delete Team" button (destructive variant) that is disabled when creating a new team.
+
+---
+
+### Tab 3: Schedule Management
+
+*   **Value**: `schedule_management`
+*   **Trigger Icon**: `Calendar` from `lucide-react`.
+*   **Content**: A container with three separate `<Card>` components for different scheduling actions.
+    1.  **Mass Generate Card**:
+        *   Form with date inputs for "Start Date" and "End Date".
+        *   Checkboxes for each day of the week.
+        *   Three time inputs for "Time Slot 1", "Time Slot 2", "Time Slot 3".
+        *   A "Generate Schedule" button.
+    2.  **Create Playoff Series Card**:
+        *   Two `<Select>` menus to choose Team 1 and Team 2.
+        *   Date and time inputs for the series start.
+        *   A "Create Playoff Series" button.
+    3.  **Single Game Card**:
+        *   Two `<Select>` menus for "Home Team" and "Away Team".
+        *   Date and time inputs for the game.
+        *   A "Create Game" button.
+
+---
+
+### Tab 4: Game Stats Management
+
+*   **Value**: `game_stats`
+*   **Trigger Icon**: `BarChart2` from `lucide-react`.
+*   **Content**:
+    *   A `<Card>` with a form to edit stats for a completed game.
+    *   **Fields**:
+        *   A `<Select>` menu to choose a completed game.
+        *   Number inputs for "Home Score" and "Away Score".
+        *   A `<Textarea>` for game notes or a summary.
+    *   **Action**: A "Save Game Stats" button that shows a confirmation toast.
+
+---
+
+### Tab 5: Image Management
+
+*   **Value**: `image_management`
+*   **Trigger Icon**: `ImageIcon` from `lucide-react`.
+*   **Content**:
+    *   A `<Card>` for updating key site images.
+    *   Use a reusable `ImageUploadRow` component for each item. This row should contain a label, description, a "Choose File" button that triggers a hidden file input, and a "Save" button.
+    *   Implement rows for:
+        *   Home Page Hero
+        *   Team Logos (with a `<Select>` menu to choose the team).
+        *   Player Headshots (with a `<Select>` menu to choose the player).
+        *   Site Logo.
+
+---
+
+### Tab 6: News Generator
+
+*   **Value**: `news_generator`
+*   **Trigger Icon**: `Newspaper` from `lucide-react`.
+*   **Content**:
+    *   A `<Card>` with a form to generate news recaps.
+    *   **Fields**:
+        *   A `<Select>` menu for "Recap Type" (Daily, Weekly).
+        *   A `<Textarea>` for optional details to focus on.
+    *   **Action**: A "Generate Recap" button.
+    *   **Display Area**: A disabled `<Card>` below the form where the "AI-generated daily news recap will appear here."
+
+---
+
+### Tab 7: Draft Management
+
+*   **Value**: `draft_management`
+*   **Trigger Icon**: `Gavel` from `lucide-react`.
+*   **Content**:
+    *   A `<Card>` to control the live draft.
+    *   **Status Display**: A nested `<Card>` showing the current draft status, the current pick number, the team "On the Clock" (with their logo), and a countdown timer formatted as `MM:SS`. A `<Progress>` bar should reflect the time remaining.
+    *   **Control Buttons**:
+        *   "Start Draft" (`<Play>` icon), disabled if the draft is not 'Not Started'.
+        *   "Pause"/"Resume" (`<Pause>` icon), which toggles its text and is disabled when the draft is over.
+        *   "Next Pick" (`<SkipForward>` icon), disabled when the draft is not 'In Progress'.
+        *   "End Draft" (`<StopCircle>` icon), disabled when the draft is 'Finished'.
+    *   **State Management**: This component will use `useAuth` to get and set the global `draftStatus` and `currentPick`. The timer should be managed with `useEffect` and `useState`.

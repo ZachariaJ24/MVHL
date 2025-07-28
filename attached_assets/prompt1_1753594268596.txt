@@ -1,0 +1,184 @@
+# MVHL Hub - Comprehensive Application Documentation
+
+## 1. Overall Architecture & Tech Stack
+
+The MVHL Hub is a modern web application built with a specific, powerful technology stack designed for performance, scalability, and AI integration.
+
+-   **Framework**: [Next.js](https://nextjs.org/) (using the App Router)
+-   **UI Library**: [React](https://react.dev/)
+-   **UI Components**: [ShadCN UI](https://ui.shadcn.com/) - A collection of beautifully designed, accessible components.
+-   **Styling**: [Tailwind CSS](https://tailwindcss.com/) - A utility-first CSS framework for rapid UI development.
+-   **AI Integration**: [Genkit](https://firebase.google.com/docs/genkit) (via `@genkit-ai/googleai`) - Powers all generative AI features, from news recaps to player headshots.
+-   **State Management**: A combination of React Context (`useAuth`) and local component state (`useState`, `useEffect`).
+-   **Backend/API**: Implemented directly within Next.js using Route Handlers.
+
+---
+
+## 2. Core Components & Layout
+
+These are the foundational UI pieces that structure the entire application.
+
+### Header (`src/components/layout/header.tsx`)
+
+The header provides consistent navigation and user session management across the site.
+
+-   **Site Logo**: A link back to the Home page.
+-   **Main Navigation**: A list of primary navigation links (`NAV_LINKS` from `src/lib/constants.ts`) that are highlighted based on the current page path. This navigation is responsive and collapses into a mobile-friendly sheet menu.
+-   **User Menu**: This is a dynamic component that changes based on the user's authentication state.
+    -   **Logged Out State**: Displays a "Login" dropdown and a "Sign Up" button.
+        -   The "Login" dropdown allows a user to simulate logging in as a 'Player', 'Management', or 'Admin', which demonstrates the app's role-based access control.
+    -   **Logged In State**: Displays a user avatar.
+        -   Clicking the avatar opens a dropdown showing the user's name and email.
+        -   It provides a direct link to the relevant user dashboard (`/player`, `/management`, or `/admin`).
+        -   Includes a "Logout" button.
+
+### Footer (`src/components/layout/footer.tsx`)
+
+The footer provides supplementary links and information.
+
+-   **Structure**: Organized into five columns for clarity:
+    1.  **Site Info**: Logo and a brief description of the MVHL.
+    2.  **League**: Links to core league pages like Standings, Stats, etc.
+    3.  **Community**: Links to engagement-focused pages like News and Awards.
+    4.  **Resources**: Links to informational pages like FAQ and Privacy.
+    5.  **Account**: Links for signing in/up and accessing user-specific dashboards.
+-   **Copyright**: Displays the current year dynamically.
+
+### State Management (`src/hooks/use-auth.tsx`)
+
+This is the **central nervous system** of the entire application. It is a React Context Provider that manages all mock data, user sessions, and global application state.
+
+-   **Data Generation**: On initial load, it calls functions from `src/lib/mock-data.ts` to generate all the league's data (teams, players, schedules, etc.) and stores it in state. This simulates a live, data-rich environment.
+-   **User Authentication**:
+    -   `login(role)`: Simulates a user logging in with a specific role. It creates a mock user object and assigns a corresponding team or player ID.
+    -   `logout()`: Clears the user session.
+    -   `signup(data)`: Creates a new "Free Agent" player and logs the user in.
+-   **State Management**: It manages application-wide state that can be manipulated from different components, such as:
+    -   `draftStatus` and `currentPick` for the live draft simulation.
+    -   `injuredReserve` and `waiverList` for team management.
+-   **Helper Functions**: Provides utility functions like `findTeam(id)` and `findPlayer(id)` so components can easily retrieve specific data.
+
+---
+
+## 3. Pages & Features
+
+This section details each page of the application, accessible via the navigation.
+
+### `/` - Home Page
+
+-   **Client Component**: `src/components/pages/home-client.tsx`
+-   **Features**:
+    -   **Hero Section**: A large, welcoming banner image.
+    -   **Score Ticker**: An auto-scrolling carousel displaying final scores from recent, completed games.
+    -   **Upcoming Matches**: A list of the next few scheduled games.
+    -   **Recent Trades**: A summary of the latest simulated trades in the league.
+    -   **Navigation Cards**: Quick-access cards linking to the Teams, News, and Awards pages.
+
+### `/teams` - Teams Page
+
+-   **Client Component**: `src/components/pages/teams-client.tsx`
+-   **Features**:
+    -   **Team Grid**: Displays all 32 teams with their logos, cities, and names in a responsive grid.
+    -   **Search Functionality**: A search bar allows users to filter teams by city or name in real-time.
+    -   **Team Details Dialog**: Clicking on a team card opens a modal window with detailed information, including:
+        -   Full team name and stadium.
+        -   Conference and division.
+        -   A full player roster table, showing player numbers, names, positions, and management roles (indicated with a star icon).
+
+### `/standings` - Standings Page
+
+-   **Client Component**: `src/components/pages/standings-client.tsx`
+-   **Features**: A multi-tabbed interface to view standings from different perspectives.
+    -   **Divisions Tab**: The default view, showing standings broken down by conference and then by division (Northeast, South, Midwest, West).
+    -   **Overall Tab**: A single table ranking all 32 teams in the league by points.
+    -   **Playoff Race Tab**: A visual representation of which teams would qualify for the playoffs if the season ended today. It shows the top 3 teams from each division and the top 2 Wild Card teams for each conference. It also lists the "On the Bubble" teams just outside the playoff picture.
+    -   **Bracket Tab**: A fully interactive, projected playoff bracket based on the current standings. It shows the matchups for every round, from the first round to the MVHL Cup Final, and predicts the winner of each series based on point totals.
+
+### `/stats` - Player Statistics Page
+
+-   **Client Component**: `src/components/pages/stats-client.tsx`
+-   **Features**: A multi-tabbed view for comprehensive player statistics.
+    -   **Tabs**: Organized by "Offense," "Defense," and "Goalies."
+    -   **Data Tables**: Each tab contains a detailed, sortable table showing a wide range of statistics relevant to that player type (e.g., points for offense, blocks for defense, save percentage for goalies).
+    -   **AI Scouting Report**: Each player row has a "Generate Report" button.
+        -   **Functionality**: Clicking this opens a dialog. The app then calls the `generateScoutingReport` Genkit flow, passing the player's name and stats.
+        -   **Output**: The AI returns a multi-paragraph scouting report analyzing the player's strengths and weaknesses, which is then displayed in the dialog.
+
+### `/awards` - Season Awards Page
+
+-   **Client Component**: `src/components/pages/awards-client.tsx`
+-   **Features**:
+    -   **Award Categories**: Displays nominees for major awards like "MVP," "Best Goalie," and "Best Defenseman."
+    -   **Nominee Cards**: Each nominee is shown on a card with their key stats.
+    -   **Voting System**: Users can vote for one nominee per award. The vote count is updated in real-time (simulated) and stored in the browser's local storage to prevent re-voting.
+    -   **Leading Nominee**: The nominee with the most votes in each category is highlighted with a "Leading" badge.
+
+### `/matches` - Matches & Scores Page
+
+-   **Client Component**: `src/components/pages/matches-client.tsx`
+-   **Features**:
+    -   **Recent Results**: A grid showing score cards for the most recently completed games.
+    -   **Full Schedule**: A table grouping all scheduled games by date.
+    -   **Match Details Dialog**: Each match (recent or scheduled) has a "View Details" button that opens a modal with two tabs:
+        -   **Lineups**: Shows the projected starting lineups for both the home and away teams.
+        -   **Stats**: For completed games, this tab displays a full box score, including team stats and individual player stats for both teams.
+
+### `/draft-central` - Live Draft Center
+
+-   **Client Component**: `src/components/pages/draft-central-client.tsx`
+-   **Features**: Simulates a live draft event.
+    -   **On The Clock**: A prominent card shows the team currently making a selection, the pick number, and a countdown timer. This state is managed globally in `useAuth` and can be controlled from the Admin Dashboard.
+    -   **Upcoming Picks Carousel**: A horizontal carousel showing the next few teams in the draft order.
+    -   **AI Draft Analyst**: A table lists completed picks.
+        -   **Functionality**: Each pick has a button to generate AI commentary. This calls the `generateDraftCommentary` Genkit flow.
+        -   **Output**: The AI provides a multi-paragraph analysis of the pick, discussing player strengths and team fit.
+    -   **Live Draft Chat**: A simulated chat room where mock users post messages every few seconds. Logged-in users can participate and send their own messages.
+
+### `/admin` - Admin Dashboard (Role-Protected)
+
+-   **Client Component**: `src/components/pages/admin-dashboard-client.tsx`
+-   **Features**: A powerful, multi-tabbed interface for managing the entire league. Access is restricted to users with the 'admin' role.
+    -   **User Management**: Assign roles and teams to users.
+    -   **Team Management**: Create, edit, or delete teams.
+    -   **Schedule Management**: Manually create single games, mass-generate a schedule for a date range, or create playoff series.
+    -   **Game Stats**: Manually enter final scores for completed games.
+    -   **Image Management**: A simulated interface for uploading new images for the home page hero, team logos, and player headshots.
+    -   **News Generator**: An interface to manually trigger the AI news recap generation.
+    -   **Draft Management**: The control center for the live draft. Admins can start, pause, resume, advance to the next pick, and end the draft. These actions update the global draft state for all users viewing the Draft Central page.
+
+### `/player` - Player Dashboard (Role-Protected)
+
+-   **Client Component**: `src/components/pages/player-dashboard-client.tsx`
+-   **Features**: A personalized dashboard for logged-in players.
+    -   **Overview**: Key cards showing the player's current team, a summary of their season stats, and their next scheduled game.
+    -   **Settings**: A form allowing the player to update their gamertag and bio.
+    -   **Availability**: A form where the player can submit their availability (Available, Maybe, Unavailable) for upcoming games.
+    -   **Roster & Schedule**: View-only tabs to see the full team roster and schedule.
+
+### `/management` - Management Dashboard (Role-Protected)
+
+-   **Client Component**: `src/components/pages/management-dashboard-client.tsx`
+-   **Features**: A comprehensive dashboard for a team's General Manager.
+    -   **Roster Management**: View the active roster.
+    -   **Injured Reserve (IR)**: Move players to and from the IR list.
+    -   **Trades**: A full trading block interface. Propose trades with other teams, view incoming offers, and manage your team's trade block.
+    -   **Contracts & Signings**: Offer contract extensions to expiring players and view the status of all pending offers.
+    -   **Waivers**: Place players on or claim players from the waiver wire, with a real-time countdown.
+    -   **Lineups**: Set your team's lineup for upcoming games.
+    -   **Draft**: A management-focused view of the draft, including the ability to look up prospects' video game stats using the `lookupChelStats` AI flow.
+    -   **Chat**: Private chat rooms for communicating with the team or other GMs.
+
+---
+
+## 4. AI Flows (`src/ai/flows/`)
+
+This directory contains all the server-side Genkit flows that power the application's AI features.
+
+-   **`generate-news-recap.ts`**: Generates a weekly news summary for the entire league or a specific team.
+-   **`generate-player-headshot.ts`**: Uses an image generation model to create a photorealistic headshot of a player.
+-   **`generate-scouting-report.ts`**: Analyzes player statistics and generates a professional scouting report.
+-   **`generate-draft-commentary.ts`**: Creates expert analysis for a specific draft pick.
+-   **`generate-hall-of-fame-retrospective.ts`**: Writes a multi-paragraph career summary for a legendary player.
+-   **`ai-powered-faq-search.ts`**: Uses an LLM to find the most relevant answer within the FAQ content based on a user's query.
+-   **`lookup-chel-stats.ts`**: Generates a plausible set of video game statistics for a given gamertag.
+
