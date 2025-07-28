@@ -123,16 +123,16 @@ export function AdminDashboard() {
     queryKey: ["/api/stats"],
   });
 
+  const { data: usersData } = useQuery({
+    queryKey: ["/api/admin/users"],
+  });
+
   const { data: activity } = useQuery({
     queryKey: ["/api/activity"],
   });
 
   const { data: draftSettings } = useQuery({
     queryKey: ["/api/draft/settings"],
-  });
-
-  const { data: usersData } = useQuery({
-    queryKey: ["/api/admin/users"],
   });
 
   const deleteUserMutation = useMutation({

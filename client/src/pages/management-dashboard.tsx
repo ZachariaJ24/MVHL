@@ -58,7 +58,7 @@ export function ManagementDashboard() {
   });
 
   // Get user's team (for demo, use first team - in production this would be based on user's team assignment)
-  const userTeam = teams?.[0] || {
+  const userTeam = (teams as any[])?.[0] || {
     id: "team-1",
     city: "Toronto", 
     name: "Maple Leafs",
@@ -73,7 +73,7 @@ export function ManagementDashboard() {
   };
 
   // Filter players for user's team
-  const teamPlayers = players?.filter((player: any) => player.teamId === userTeam.id) || [];
+  const teamPlayers = (players as any[])?.filter((player: any) => player.teamId === userTeam.id) || [];
 
   const mockTeam = {
     ...userTeam,
@@ -789,7 +789,7 @@ export function ManagementDashboard() {
                               </SelectTrigger>
                             </FormControl>
                             <SelectContent>
-                              {mockRoster.map((player: any) => (
+                              {teamRoster.map((player: any) => (
                                 <SelectItem key={player.id} value={player.id}>
                                   {player.name} ({player.position})
                                 </SelectItem>

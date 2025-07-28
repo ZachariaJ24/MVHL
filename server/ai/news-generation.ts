@@ -1,6 +1,9 @@
-import { GoogleGenAI } from "@google/genai";
+import OpenAI from "openai";
 
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || "" });
+// the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY || ""
+});
 
 interface NewsGenerationResult {
   title: string;
@@ -37,30 +40,17 @@ League: MVHL (Major Virtual Hockey League)
 
 Include relevant hockey statistics, team information, and player details that would be realistic for a professional hockey league.`;
 
-    const response = await ai.models.generateContent({
-      model: "gemini-2.5-pro",
-      config: {
-        systemInstruction: systemPrompt,
-        responseMimeType: "application/json",
-        responseSchema: {
-          type: "object",
-          properties: {
-            title: { type: "string" },
-            excerpt: { type: "string" },
-            content: { type: "string" },
-            readTime: { type: "string" },
-            tags: { 
-              type: "array",
-              items: { type: "string" }
-            }
-          },
-          required: ["title", "excerpt", "content", "readTime", "tags"],
-        },
-      },
-      contents: prompt,
+    // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
+    const response = await openai.chat.completions.create({
+      model: "gpt-4o",
+      messages: [
+        { role: "system", content: systemPrompt },
+        { role: "user", content: prompt }
+      ],
+      response_format: { type: "json_object" },
     });
 
-    const rawJson = response.text;
+    const rawJson = response.choices[0]?.message?.content;
     if (rawJson) {
       const result: NewsGenerationResult = JSON.parse(rawJson);
       return {

@@ -3,8 +3,8 @@ import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { Header } from "./components/layout/header";
-import { Footer } from "./components/layout/footer";
+import { RedesignedHeader } from "./components/layout/redesigned-header";
+import { RedesignedFooter } from "./components/layout/redesigned-footer";
 import { Home } from "./pages/home";
 import { Teams } from "./pages/teams";
 import { Standings } from "./pages/standings";
@@ -24,6 +24,8 @@ import { FAQ } from "./pages/faq";
 import { Privacy } from "./pages/privacy";
 import { ImageUploadCenter } from "./pages/image-upload-center";
 import { Support } from "./pages/support";
+import { FreeAgency } from "./pages/free-agency";
+import { AllStarVote } from "./pages/all-star-vote";
 import NotFound from "@/pages/not-found";
 import { AuthProvider } from "./hooks/use-auth";
 
@@ -38,10 +40,11 @@ function Router() {
       <Route path="/matches" component={Matches} />
       <Route path="/playoffs" component={Playoffs} />
       <Route path="/draft-central" component={DraftCentral} />
-      <Route path="/admin" component={AdminDashboard} />
-      <Route path="/player" component={PlayerDashboard} />
-      <Route path="/management" component={ManagementDashboard} />
+      <Route path="/admin-dashboard" component={AdminDashboard} />
+      <Route path="/player-dashboard" component={PlayerDashboard} />
       <Route path="/management-dashboard" component={ManagementDashboard} />
+      <Route path="/free-agency" component={FreeAgency} />
+      <Route path="/all-star-vote" component={AllStarVote} />
       <Route path="/about" component={About} />
       <Route path="/rules" component={Rules} />
       <Route path="/news" component={News} />
@@ -61,11 +64,11 @@ function App() {
       <TooltipProvider>
         <AuthProvider>
           <div className="min-h-screen bg-background">
-            <Header />
-            <main className="container mx-auto px-4 py-8 min-h-[calc(100vh-200px)]">
+            <RedesignedHeader />
+            <main className="min-h-[calc(100vh-200px)]">
               <Router />
             </main>
-            <Footer />
+            <RedesignedFooter />
           </div>
           <Toaster />
         </AuthProvider>
