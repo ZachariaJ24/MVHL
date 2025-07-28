@@ -103,11 +103,7 @@ export function RedesignedHeader() {
             </Link>
           </div>
 
-          {/* Auth Buttons */}
-          <Button variant="outline" size="sm" className="hidden sm:flex items-center space-x-1">
-            <LogIn className="h-4 w-4" />
-            <span>Sign In</span>
-          </Button>
+
 
           {/* Mobile Menu */}
           <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
@@ -161,17 +157,7 @@ export function RedesignedHeader() {
                   </Link>
                 </div>
 
-                <div className="space-y-2 border-t pt-4">
-                  <h3 className="text-lg font-semibold">Account</h3>
-                  <Button variant="outline" className="w-full justify-start space-x-2">
-                    <LogIn className="h-4 w-4" />
-                    <span>Sign In</span>
-                  </Button>
-                  <Button className="w-full justify-start space-x-2">
-                    <UserPlus className="h-4 w-4" />
-                    <span>Sign Up</span>
-                  </Button>
-                </div>
+
               </div>
             </SheetContent>
           </Sheet>

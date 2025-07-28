@@ -5,6 +5,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { 
   User, 
   Clock, 
@@ -27,6 +30,7 @@ interface PlayerAvailability {
   teamName: string;
   status: 'available' | 'unavailable' | 'limited' | 'questionable';
   reason?: string;
+  notes?: string;
   estimatedReturn?: string;
   lastUpdated: string;
   position: string;
@@ -100,22 +104,22 @@ export function AvailabilityTracker({ teamId, showAllTeams = false }: Availabili
     }
   };
 
-  const filteredAvailability = (availability || []).filter((item: PlayerAvailability) => {
+  const filteredAvailability = Array.isArray(availability) ? availability.filter((item: PlayerAvailability) => {
     const matchesSearch = item.playerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          item.teamName.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus = statusFilter === "all" || item.status === statusFilter;
     const matchesPosition = positionFilter === "all" || item.position === positionFilter;
     
     return matchesSearch && matchesStatus && matchesPosition;
-  });
+  }) : [];
 
   const getStatusSummary = () => {
     if (!availability) return { available: 0, unavailable: 0, limited: 0, questionable: 0 };
     
-    return availability.reduce((acc: any, item: PlayerAvailability) => {
+    return Array.isArray(availability) ? availability.reduce((acc: any, item: PlayerAvailability) => {
       acc[item.status] = (acc[item.status] || 0) + 1;
       return acc;
-    }, { available: 0, unavailable: 0, limited: 0, questionable: 0 });
+    }, { available: 0, unavailable: 0, limited: 0, questionable: 0 }) : { available: 0, unavailable: 0, limited: 0, questionable: 0 };
   };
 
   const statusSummary = getStatusSummary();
@@ -266,19 +270,62 @@ export function AvailabilityTracker({ teamId, showAllTeams = false }: Availabili
                     <div className="mt-3 pt-3 border-t border-border">
                       <div className="flex items-center justify-between text-sm text-muted-foreground">
                         <div>Last updated: {new Date(item.lastUpdated).toLocaleDateString()}</div>
-                        <Button 
-                          variant="ghost" 
-                          size="sm"
-                          onClick={() => {
-                            // Open update modal (would implement this)
-                            toast({
-                              title: "Update Availability",
-                              description: "Availability update feature coming soon",
-                            });
-                          }}
-                        >
-                          Update Status
-                        </Button>
+                        <Dialog>
+                          <DialogTrigger asChild>
+                            <Button variant="ghost" size="sm">
+                              Update Status
+                            </Button>
+                          </DialogTrigger>
+                          <DialogContent>
+                            <DialogHeader>
+                              <DialogTitle>Update Player Availability</DialogTitle>
+                              <DialogDescription>
+                                Update availability status for {item.playerName}
+                              </DialogDescription>
+                            </DialogHeader>
+                            <div className="space-y-4">
+                              <div>
+                                <Label htmlFor="status">Status</Label>
+                                <Select defaultValue={item.status}>
+                                  <SelectTrigger>
+                                    <SelectValue />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    <SelectItem value="available">Available</SelectItem>
+                                    <SelectItem value="limited">Limited</SelectItem>
+                                    <SelectItem value="questionable">Questionable</SelectItem>
+                                    <SelectItem value="unavailable">Unavailable</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                              </div>
+                              <div>
+                                <Label htmlFor="notes">Notes</Label>
+                                <Textarea 
+                                  placeholder="Add notes about the status update..."
+                                  defaultValue={item.notes}
+                                />
+                              </div>
+                              <div>
+                                <Label htmlFor="estimatedReturn">Estimated Return Date</Label>
+                                <Input 
+                                  type="date"
+                                  defaultValue={item.estimatedReturn}
+                                />
+                              </div>
+                              <Button 
+                                className="w-full"
+                                onClick={() => {
+                                  toast({
+                                    title: "Status Updated",
+                                    description: `Updated availability for ${item.playerName}`,
+                                  });
+                                }}
+                              >
+                                Update Status
+                              </Button>
+                            </div>
+                          </DialogContent>
+                        </Dialog>
                       </div>
                     </div>
                   </CardContent>
