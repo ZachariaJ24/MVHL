@@ -2,6 +2,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Trophy, TrendingUp, Users, Target } from "lucide-react";
+import { PlayoffBracket } from "@/components/standings/playoff-bracket";
 import { useQuery } from "@tanstack/react-query";
 
 interface Team {
@@ -311,6 +312,10 @@ export function Standings() {
 
         {/* Playoff Bracket Tab */}
         <TabsContent value="bracket" className="space-y-6">
+          <div className="grid lg:grid-cols-2 gap-8">
+            <PlayoffBracket teams={teams || []} conference="Eastern" />
+            <PlayoffBracket teams={teams || []} conference="Western" />
+          </div>
           <Card className="bg-gradient-to-br from-yellow-500/20 to-yellow-600/20 border-yellow-500/50">
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-yellow-400">

@@ -13,7 +13,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/use-auth";
 import { apiRequest } from "@/lib/queryClient";
-import { useDraftWebSocket } from "@/hooks/use-draft-websocket";
+import { CountdownTimer } from "@/components/draft/countdown-timer";
 import type { DraftProspect, DraftSettings, Team } from "@shared/schema";
 
 export function DraftCentral() {
@@ -24,8 +24,14 @@ export function DraftCentral() {
   const [positionFilter, setPositionFilter] = useState<string>("all");
   const [selectedProspect, setSelectedProspect] = useState<DraftProspect | null>(null);
   
-  // Connect to WebSocket for real-time draft updates
-  useDraftWebSocket();
+  // Mock draft settings for demonstration
+  const mockDraftSettings = {
+    isActive: true,
+    currentRound: 1,
+    currentPick: 5,
+    timeRemaining: 45,
+    pickOrder: []
+  };
 
   const { data: draftPicks, isLoading: picksLoading } = useQuery({
     queryKey: ["/api/draft/picks"],
@@ -233,6 +239,21 @@ export function DraftCentral() {
           )}
         </CardContent>
       </Card>
+
+      {/* Draft Timer */}
+      <CountdownTimer 
+        timeRemaining={mockDraftSettings.timeRemaining}
+        isActive={mockDraftSettings.isActive}
+        currentPick={mockDraftSettings.currentPick}
+        currentRound={mockDraftSettings.currentRound}
+        onTimeExpired={() => {
+          toast({
+            title: "Pick Time Expired",
+            description: "The time limit for this pick has expired",
+            variant: "destructive",
+          });
+        }}
+      />
 
       {/* Draft Pick Carousel - NHL Style */}
       <Card>

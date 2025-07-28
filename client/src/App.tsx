@@ -26,6 +26,9 @@ import { ImageUploadCenter } from "./pages/image-upload-center";
 import { Support } from "./pages/support";
 import { FreeAgency } from "./pages/free-agency";
 import { AllStarVote } from "./pages/all-star-vote";
+import { PlayerAvailability } from "./pages/player-availability";
+import { ContractNegotiations } from "./pages/contract-negotiations";
+import { Waivers } from "./pages/waivers";
 import NotFound from "@/pages/not-found";
 import { AuthProvider } from "./hooks/use-auth";
 
@@ -53,6 +56,9 @@ function Router() {
       <Route path="/privacy" component={Privacy} />
       <Route path="/support" component={Support} />
       <Route path="/images" component={ImageUploadCenter} />
+      <Route path="/player-availability" component={PlayerAvailability} />
+      <Route path="/contract-negotiations" component={ContractNegotiations} />
+      <Route path="/waivers" component={Waivers} />
       <Route component={NotFound} />
     </Switch>
   );
