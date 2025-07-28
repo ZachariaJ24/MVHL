@@ -57,6 +57,12 @@ export const players = pgTable("players", {
   otLosses: integer("ot_losses").default(0),
   gaa: text("gaa").default("0.00"),
   svPct: text("sv_pct").default("0.000"),
+  // Contract and IR info
+  salary: integer("salary").default(0),
+  contractYears: integer("contract_years").default(1),
+  injuryStatus: text("injury_status").default("healthy"), // 'healthy', 'day-to-day', 'ir', 'ltir'
+  injuryDescription: text("injury_description"),
+  expectedReturn: timestamp("expected_return"),
 });
 
 // Games

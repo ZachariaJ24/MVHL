@@ -569,7 +569,7 @@ export function PlayerDashboard() {
                   <Dialog>
                     <DialogTrigger asChild>
                       <Button className="w-full">
-                        Update Status
+                        Save
                       </Button>
                     </DialogTrigger>
                     <DialogContent>
