@@ -10,12 +10,13 @@ Player Name: ${input.playerName}
 
 Focus on their career achievements, impact on the sport, memorable moments, and lasting legacy.`;
 
-  const response = await ai.models.generateContent({
-    model: "gemini-2.5-flash",
-    contents: prompt,
+  // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
+  const response = await ai.chat.completions.create({
+    model: "gpt-4o",
+    messages: [{ role: "user", content: prompt }],
   });
 
   return {
-    retrospective: response.text || "Unable to generate retrospective at this time."
+    retrospective: response.choices[0]?.message?.content || "Unable to generate retrospective at this time."
   };
 }

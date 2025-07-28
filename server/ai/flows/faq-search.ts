@@ -47,12 +47,13 @@ ${query}
 
 Answer:`;
 
-  const response = await ai.models.generateContent({
-    model: "gemini-2.5-flash",
-    contents: prompt,
+  // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
+  const response = await ai.chat.completions.create({
+    model: "gpt-4o",
+    messages: [{ role: "user", content: prompt }],
   });
 
   return {
-    answer: response.text || "I couldn't find an answer to your question in the FAQ."
+    answer: response.choices[0]?.message?.content || "I couldn't find an answer to your question in the FAQ."
   };
 }

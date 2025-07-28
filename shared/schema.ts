@@ -303,6 +303,10 @@ export const playerHeadshotInputSchema = z.object({
   position: z.string().min(1, "Position is required"),
 });
 
+export const hallOfFameInputSchema = z.object({
+  playerName: z.string().min(1, "Player name is required"),
+});
+
 // Trade schemas
 export const tradeOfferSchema = z.object({
   fromTeamId: z.string().min(1, "From team is required"),
@@ -515,6 +519,7 @@ export type ScoutingReportInput = z.infer<typeof scoutingReportInputSchema>;
 export type NewsRecapInput = z.infer<typeof newsRecapInputSchema>;
 export type PlayerStatsInput = z.infer<typeof playerStatsInputSchema>;
 export type PlayerHeadshotInput = z.infer<typeof playerHeadshotInputSchema>;
+export type HallOfFameInput = z.infer<typeof hallOfFameInputSchema>;
 export type TradeOfferInput = z.infer<typeof tradeOfferSchema>;
 export type PlayerUpdateInput = z.infer<typeof playerUpdateSchema>;
 export type NewsGenerationInput = z.infer<typeof newsGenerationSchema>;

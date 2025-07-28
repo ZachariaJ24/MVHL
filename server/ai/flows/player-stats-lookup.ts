@@ -30,16 +30,15 @@ Respond in JSON format with the following structure:
   }
 }`;
 
-  const response = await ai.models.generateContent({
-    model: "gemini-2.5-pro",
-    config: {
-      responseMimeType: "application/json",
-    },
-    contents: prompt,
+  // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
+  const response = await ai.chat.completions.create({
+    model: "gpt-4o",
+    messages: [{ role: "user", content: prompt }],
+    response_format: { type: "json_object" },
   });
 
   try {
-    const stats = JSON.parse(response.text || '{}');
+    const stats = JSON.parse(response.choices[0]?.message?.content || '{}');
     return stats;
   } catch (error) {
     return {

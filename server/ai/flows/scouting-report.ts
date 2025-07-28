@@ -20,12 +20,13 @@ Statistics:
 
 Write a concise scouting report (approximately 3-4 paragraphs) highlighting the player's strengths and weaknesses based on the provided statistics.`;
 
-  const response = await ai.models.generateContent({
-    model: "gemini-2.5-flash",
-    contents: prompt,
+  // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
+  const response = await ai.chat.completions.create({
+    model: "gpt-4o",
+    messages: [{ role: "user", content: prompt }],
   });
 
   return {
-    scoutingReport: response.text || "Unable to generate scouting report at this time."
+    scoutingReport: response.choices[0]?.message?.content || "Unable to generate scouting report at this time."
   };
 }

@@ -70,11 +70,10 @@ The application provides comprehensive league management functionality:
 ## External Dependencies
 
 ### AI Services
-- **Google Gemini AI**: Primary AI provider for text and image generation
+- **OpenAI**: Primary AI provider for text and image generation (migrated from Google Gemini)
 - **Models Used**: 
-  - `gemini-2.5-flash` for text generation
-  - `gemini-2.5-pro` for structured JSON responses
-  - `gemini-2.0-flash-preview-image-generation` for headshot generation
+  - `gpt-4o` for text generation and analysis (newest OpenAI model released May 13, 2024)
+  - `dall-e-3` for player headshot generation
 
 ### UI Libraries
 - **Radix UI**: Accessible component primitives
@@ -107,9 +106,15 @@ The application provides comprehensive league management functionality:
 - **Player Distribution**: Each team has 4C, 4LW, 4RW, 3LD, 3RD, 2G players for realistic lineup management
 
 ### Environment Configuration
-- **Required**: `GEMINI_API_KEY` or `GOOGLE_AI_API_KEY` for AI features
-- **Optional**: `DATABASE_URL` for PostgreSQL connection
+- **Required**: `OPENAI_API_KEY` for AI features (migrated from Google Gemini)
+- **Required**: `DATABASE_URL` for PostgreSQL connection (automatically configured)
 - **Development**: Automatic Replit integration support
+
+## Recent Changes
+- **July 28, 2025**: Successfully migrated from Replit Agent to standard Replit environment
+- **AI Migration**: Converted all AI flows from Google Gemini to OpenAI for improved reliability
+- **Database Setup**: PostgreSQL database created and seeded with complete MVHL league data
+- **Schema Updates**: Added HallOfFameInput type and updated all AI flow functions
 
 ### Professional Theming
 - **Design**: Professional dark theme with modern aesthetics
