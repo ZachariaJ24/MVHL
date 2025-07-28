@@ -1,0 +1,114 @@
+You’re a full-stack dev working on a hockey esports league management platform (MVHL) for NHL 25. The system includes an Admin Panel, Player Panel, Team Management system, and full public-facing website.
+
+⚠️ Fix these issues in the Admin Panel:
+
+1. **User Management**
+   - Cannot update user roles or assign them to teams.
+
+2. **Team Management**
+   - Cannot edit teams or sync changes.
+   - Roster actions do not work.
+   - Lineup "Save" button does not save lineups.
+   - No Salary Breakdown implemented in the Finances tab.
+   - Trades page, Reports page, and Schedule page do not load.
+   - Add new tabs:  
+     a. **Player Availability Tab** — pulls data from player panel  
+     b. **Contract Negotiation Tab** — 1 contract offer per team, trade clause toggle, dollar format  
+     c. **Waivers Tab** — Waived players claimable by teams for 30 mins, then open to others for 8 hrs  
+     d. **Team Management Chat** — visible to GM, AGM, Owner, marked with a ⭐ next to names  
+
+3. **Draft Control**
+   - Only works from Draft Central.
+   - Draft countdown does not function.
+   - No team-based draft room or countdown UI in the panel.
+   - Team draft room should display: who’s on the clock, recent picks, team draft chat.
+
+4. **Player Panel**
+   - "Availability → Save Changes" does nothing — backend should persist data.
+   - No effect on Manager-side availability views.
+
+5. **Schedule & Stats Management**
+   - Cannot test due to lack of completed matches — create dummy data or add backend error handling.
+
+6. **Image Uploader**
+   - Doesn’t upload or sync images to intended areas.
+
+7. **News Generator**
+   - Fails every time — ensure content gets created and saved to DB.
+
+8. **Player Lookup (Chel Stats)**
+   - Returns "Player not found or error retrieving stats" — fix gamertag validation & external API call.
+
+9. **Draft Area**
+   - Team chat doesn’t work.
+   - No interface for making picks.
+   - No draft clock countdown or turn indicator.
+
+---
+
+💻 Website Build Instructions
+
+**Header Pages (fully built, nothing blank):**  
+Home, Teams, Standings, Stats, Awards, Matches, News, Free Agency, All-Star Vote, Draft Central
+
+**Footer Structure:**  
+League: Home, Teams, Standings, Stats, Matches  
+Community: News, Awards, Free Agency, All-Star Vote  
+Resources: Rules, FAQ, Privacy Policy, Disclaimer, Contact Us  
+Panels: Sign In, Sign Up, Admin Panel, Team Management, Player Panel
+
+**Standings Page:**  
+Bracket layout like NHL playoffs → 2 Eastern Divisions: South, NorthEast | 2 Western: Midwest, West  
+Finals meet in center for MVHL Cup  
+
+---
+
+📊 Stats Page Layout
+
+**Offense:**  
+Pos, GP, G, A, Pts, PPG, +/-, SOG, Hits, PIM, BLK, TKA, GVA, INT, Pass%, PassAtt, FOW, FO%, Record
+
+**Defense:**  
+Pos, GP, G, A, Pts, PPG, +/-, SOG, Hits, PIM, BLK, TKA, GVA, INT, Pass%, PassAtt, Record
+
+**Goalie:**  
+GP, Record, Saves, Shots, GA, SV%, GAA  
+→ Add action buttons for AI reports
+
+---
+
+🏆 Awards Page  
+Dark-themed layout with a **vote button**, one vote per IP. Fully functional.
+
+📅 Matches Page  
+Completely build out with filters, team logos, score display.
+
+📰 News  
+Auto-generate or admin-posted updates with image support.
+
+---
+
+💼 Free Agency Page  
+Show Name, Pos, Top 4 Stats, Performance History
+
+🌟 All-Star Voting  
+1 vote/IP, 1 per position *per conference*, only from user's conference
+
+---
+
+🏠 Home Page Redesign
+
+**Header Area**  
+- Teams, Players, Games, and Active Trades counters animate as you scroll  
+- Larger "About MVHL" section with 2 blurbs:  
+  1. “Premier NHL 25 League”  
+  2. “Professional Community”  
+
+**Advanced League Features**  
+Show off with icons + short descriptions
+
+**Upcoming MVHL Matches**  
+Carousel with arrow buttons (left/right)
+
+**Recent Player Trades**  
+Live feed like:

@@ -343,6 +343,52 @@ export const draftActionSchema = z.object({
   }).optional(),
 });
 
+// IR (Injured Reserve) System
+export const injuredReserve = pgTable("injured_reserve", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  playerId: varchar("player_id").notNull(),
+  teamId: varchar("team_id").notNull(),
+  injuryType: text("injury_type").notNull(),
+  description: text("description"),
+  dateInjured: timestamp("date_injured").notNull(),
+  expectedReturn: timestamp("expected_return"),
+  status: text("status").default("ir"), // 'ir', 'ltir', 'day-to-day', 'returned'
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Lineups
+export const lineups = pgTable("lineups", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  teamId: varchar("team_id").notNull(),
+  gameId: varchar("game_id"),
+  name: text("name").notNull(),
+  positions: json("positions").$type<Record<string, string>>(),
+  isActive: boolean("is_active").default(false),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Team Schedule Enhanced
+export const teamSchedule = pgTable("team_schedule", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  teamId: varchar("team_id").notNull(),
+  gameId: varchar("game_id").notNull(),
+  opponent: text("opponent").notNull(),
+  homeAway: text("home_away").notNull(), // 'home', 'away'
+  gameDate: timestamp("game_date").notNull(),
+  venue: text("venue"),
+  isPlayoff: boolean("is_playoff").default(false),
+  status: text("status").default("scheduled"), // 'scheduled', 'live', 'completed', 'postponed'
+});
+
+export type InjuredReserve = typeof injuredReserve.$inferSelect;
+export type InsertInjuredReserve = typeof injuredReserve.$inferInsert;
+export type Lineup = typeof lineups.$inferSelect;
+export type InsertLineup = typeof lineups.$inferInsert;
+export type TeamSchedule = typeof teamSchedule.$inferSelect;
+export type InsertTeamSchedule = typeof teamSchedule.$inferInsert;
+
 // News generation schemas
 export const newsGenerationSchema = z.object({
   topic: z.string().min(1, "Topic is required"),

@@ -9,7 +9,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from "@/components/ui/dialog";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Building2, Users, TrendingUp, Trophy, DollarSign, Calendar, MessageSquare, Target, Handshake, FileText, Crown, Search, Send, Check, X, User, Camera } from "lucide-react";
+import { Building2, Users, TrendingUp, Trophy, DollarSign, Calendar, MessageSquare, Target, Handshake, FileText, Crown, Search, Send, Check, X, User, Camera, Edit } from "lucide-react";
 import { Link } from "wouter";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
@@ -330,7 +330,52 @@ export function ManagementDashboard() {
                         </Badge>
                       </TableCell>
                       <TableCell>
-                        <Button size="sm" variant="outline">Manage</Button>
+                        <Dialog>
+                          <DialogTrigger asChild>
+                            <Button size="sm" variant="outline">
+                              <Edit className="h-4 w-4 mr-1" />
+                              Edit
+                            </Button>
+                          </DialogTrigger>
+                          <DialogContent>
+                            <DialogHeader>
+                              <DialogTitle>Edit Player Status</DialogTitle>
+                              <DialogDescription>
+                                Update {player.name}'s availability and injury status
+                              </DialogDescription>
+                            </DialogHeader>
+                            <div className="space-y-4">
+                              <div>
+                                <label className="text-sm font-medium">Availability</label>
+                                <Select defaultValue="available">
+                                  <SelectTrigger>
+                                    <SelectValue />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    <SelectItem value="available">Available</SelectItem>
+                                    <SelectItem value="maybe">Maybe</SelectItem>
+                                    <SelectItem value="unavailable">Unavailable</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                              </div>
+                              <div>
+                                <label className="text-sm font-medium">Injury Status</label>
+                                <Select defaultValue="healthy">
+                                  <SelectTrigger>
+                                    <SelectValue />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    <SelectItem value="healthy">Healthy</SelectItem>
+                                    <SelectItem value="day-to-day">Day-to-Day</SelectItem>
+                                    <SelectItem value="ir">Injured Reserve</SelectItem>
+                                    <SelectItem value="ltir">Long-Term IR</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                              </div>
+                              <Button className="w-full">Update Status</Button>
+                            </div>
+                          </DialogContent>
+                        </Dialog>
                       </TableCell>
                     </TableRow>
                   ))}
@@ -601,12 +646,20 @@ export function ManagementDashboard() {
               </CardContent>
             </Card>
 
-            {/* Team Chat */}
+            {/* Team Chat with Draft Clock */}
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center space-x-2">
-                  <MessageSquare className="h-5 w-5 text-blue-500" />
-                  <span>Team Chat</span>
+                <CardTitle className="flex items-center justify-between">
+                  <div className="flex items-center space-x-2">
+                    <MessageSquare className="h-5 w-5 text-blue-500" />
+                    <span>Draft Chat</span>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <div className="text-2xl font-mono bg-red-100 dark:bg-red-900 px-3 py-1 rounded-lg text-red-700 dark:text-red-300">
+                      {Math.floor(draftTimer / 60)}:{(draftTimer % 60).toString().padStart(2, '0')}
+                    </div>
+                    <Badge variant="outline">Pick #{(draftSettings as any)?.currentPick || 1}</Badge>
+                  </div>
                 </CardTitle>
                 <CardDescription>Communicate with your team during the draft</CardDescription>
               </CardHeader>

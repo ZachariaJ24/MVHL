@@ -110,6 +110,7 @@ export interface IStorage {
   // AI Content
   createGeneratedContent(content: InsertContent): Promise<GeneratedContent>;
   getGeneratedContent(type?: string): Promise<GeneratedContent[]>;
+  getAllGeneratedContent(): Promise<GeneratedContent[]>;
   
   // Activity
   createActivity(activity: InsertActivity): Promise<ActivityLog>;
@@ -485,6 +486,18 @@ export class MemStorage implements IStorage {
       return allContent.filter(c => c.type === type);
     }
     return allContent.sort((a, b) => 
+      (b.createdAt?.getTime() || 0) - (a.createdAt?.getTime() || 0)
+    );
+  }
+
+  async getAllGeneratedContent(): Promise<GeneratedContent[]> {
+    return Array.from(this.content.values()).sort((a, b) => 
+      (b.createdAt?.getTime() || 0) - (a.createdAt?.getTime() || 0)
+    );
+  }
+
+  async getAllGeneratedContent(): Promise<GeneratedContent[]> {
+    return Array.from(this.content.values()).sort((a, b) => 
       (b.createdAt?.getTime() || 0) - (a.createdAt?.getTime() || 0)
     );
   }
@@ -1034,6 +1047,16 @@ export class DatabaseStorage implements IStorage {
         .where(eq(generatedContent.type, type))
         .orderBy(desc(generatedContent.createdAt));
     }
+    return await db.select().from(generatedContent)
+      .orderBy(desc(generatedContent.createdAt));
+  }
+
+  async getAllGeneratedContent(): Promise<GeneratedContent[]> {
+    return await db.select().from(generatedContent)
+      .orderBy(desc(generatedContent.createdAt));
+  }
+
+  async getAllGeneratedContent(): Promise<GeneratedContent[]> {
     return await db.select().from(generatedContent)
       .orderBy(desc(generatedContent.createdAt));
   }
