@@ -81,6 +81,18 @@ export function RedesignedHeader() {
 
         {/* Right Actions */}
         <div className="flex items-center space-x-2">
+          {/* Authentication Buttons */}
+          <div className="hidden md:flex items-center space-x-1">
+            <Button variant="outline" size="sm" className="flex items-center space-x-1">
+              <LogIn className="h-4 w-4" />
+              <span>Sign In</span>
+            </Button>
+            <Button size="sm" className="flex items-center space-x-1 bg-blue-600 hover:bg-blue-700">
+              <UserCog className="h-4 w-4" />
+              <span>Sign Up</span>
+            </Button>
+          </div>
+
           {/* Panel Access Buttons */}
           <div className="hidden md:flex items-center space-x-1">
             <Link href="/admin-dashboard">
@@ -133,6 +145,18 @@ export function RedesignedHeader() {
                       </Link>
                     );
                   })}
+                </div>
+
+                <div className="space-y-2 border-t pt-4">
+                  <h3 className="text-lg font-semibold">Authentication</h3>
+                  <Button variant="outline" className="w-full justify-start space-x-2">
+                    <LogIn className="h-4 w-4" />
+                    <span>Sign In</span>
+                  </Button>
+                  <Button className="w-full justify-start space-x-2 bg-blue-600 hover:bg-blue-700">
+                    <UserCog className="h-4 w-4" />
+                    <span>Sign Up</span>
+                  </Button>
                 </div>
 
                 <div className="space-y-2 border-t pt-4">
