@@ -67,6 +67,7 @@ export interface IStorage {
   getPlayersByTeam(teamId: string): Promise<Player[]>;
   createPlayer(player: InsertPlayer): Promise<Player>;
   updatePlayer(id: string, updates: Partial<Player>): Promise<Player>;
+  deletePlayer(id: string): Promise<void>;
   
   // Games
   getAllGames(): Promise<Game[]>;
@@ -340,7 +341,12 @@ export class MemStorage implements IStorage {
       isManagement: insertPlayer.isManagement || null,
       gamertag: insertPlayer.gamertag || null,
       bio: insertPlayer.bio || null,
-      availability: insertPlayer.availability || null
+      availability: insertPlayer.availability || null,
+      salary: insertPlayer.salary || null,
+      contractYears: insertPlayer.contractYears || null,
+      injuryStatus: insertPlayer.injuryStatus || null,
+      injuryDescription: insertPlayer.injuryDescription || null,
+      expectedReturn: insertPlayer.expectedReturn || null
     };
     this.players.set(id, player);
     return player;
@@ -352,6 +358,10 @@ export class MemStorage implements IStorage {
     const updatedPlayer = { ...player, ...updates };
     this.players.set(id, updatedPlayer);
     return updatedPlayer;
+  }
+
+  async deletePlayer(id: string): Promise<void> {
+    this.players.delete(id);
   }
 
   // Game methods
@@ -486,12 +496,6 @@ export class MemStorage implements IStorage {
       return allContent.filter(c => c.type === type);
     }
     return allContent.sort((a, b) => 
-      (b.createdAt?.getTime() || 0) - (a.createdAt?.getTime() || 0)
-    );
-  }
-
-  async getAllGeneratedContent(): Promise<GeneratedContent[]> {
-    return Array.from(this.content.values()).sort((a, b) => 
       (b.createdAt?.getTime() || 0) - (a.createdAt?.getTime() || 0)
     );
   }
@@ -848,6 +852,10 @@ export class DatabaseStorage implements IStorage {
     return player;
   }
 
+  async deletePlayer(id: string): Promise<void> {
+    await db.delete(players).where(eq(players.id, id));
+  }
+
   // Games
   async getAllGames(): Promise<Game[]> {
     return await db.select().from(games);
@@ -1047,11 +1055,6 @@ export class DatabaseStorage implements IStorage {
         .where(eq(generatedContent.type, type))
         .orderBy(desc(generatedContent.createdAt));
     }
-    return await db.select().from(generatedContent)
-      .orderBy(desc(generatedContent.createdAt));
-  }
-
-  async getAllGeneratedContent(): Promise<GeneratedContent[]> {
     return await db.select().from(generatedContent)
       .orderBy(desc(generatedContent.createdAt));
   }

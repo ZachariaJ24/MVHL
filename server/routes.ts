@@ -283,7 +283,7 @@ export function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/content", async (req, res) => {
     try {
-      const content = await storage.saveGeneratedContent(req.body);
+      const content = await storage.createGeneratedContent(req.body);
       res.json(content);
     } catch (error) {
       console.error("Error saving generated content:", error);
