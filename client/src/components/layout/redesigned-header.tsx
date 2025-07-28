@@ -3,6 +3,14 @@ import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { 
   Home, 
   Users, 
@@ -18,7 +26,9 @@ import {
   LogIn,
   UserCog,
   Building2,
-  Settings
+  Settings,
+  ChevronDown,
+  User
 } from "lucide-react";
 
 const MAIN_NAVIGATION = [
@@ -81,39 +91,52 @@ export function RedesignedHeader() {
 
         {/* Right Actions */}
         <div className="flex items-center space-x-2">
-          {/* Authentication Buttons */}
-          <div className="hidden md:flex items-center space-x-1">
-            <Button variant="outline" size="sm" className="flex items-center space-x-1">
-              <LogIn className="h-4 w-4" />
-              <span>Sign In</span>
-            </Button>
-            <Button size="sm" className="flex items-center space-x-1 bg-blue-600 hover:bg-blue-700">
-              <UserCog className="h-4 w-4" />
-              <span>Sign Up</span>
-            </Button>
+          {/* Authentication Dropdown */}
+          <div className="hidden md:flex items-center">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="sm" className="flex items-center space-x-1">
+                  <User className="h-4 w-4" />
+                  <span>Account</span>
+                  <ChevronDown className="h-3 w-3" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-48">
+                <DropdownMenuLabel>Authentication</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem className="flex items-center space-x-2 cursor-pointer">
+                  <LogIn className="h-4 w-4" />
+                  <span>Sign In</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem className="flex items-center space-x-2 cursor-pointer">
+                  <UserCog className="h-4 w-4" />
+                  <span>Sign Up</span>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuLabel>Quick Access</DropdownMenuLabel>
+                <DropdownMenuItem asChild>
+                  <Link href="/admin-dashboard" className="flex items-center space-x-2 cursor-pointer">
+                    <Settings className="h-4 w-4" />
+                    <span>Admin Panel</span>
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href="/management-dashboard" className="flex items-center space-x-2 cursor-pointer">
+                    <Building2 className="h-4 w-4" />
+                    <span>Team Management</span>
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href="/player-dashboard" className="flex items-center space-x-2 cursor-pointer">
+                    <UserCog className="h-4 w-4" />
+                    <span>Player Dashboard</span>
+                  </Link>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
 
-          {/* Panel Access Buttons */}
-          <div className="hidden md:flex items-center space-x-1">
-            <Link href="/admin-dashboard">
-              <Button variant="outline" size="sm" className="flex items-center space-x-1">
-                <Settings className="h-4 w-4" />
-                <span>Admin</span>
-              </Button>
-            </Link>
-            <Link href="/management-dashboard">
-              <Button variant="outline" size="sm" className="flex items-center space-x-1">
-                <Building2 className="h-4 w-4" />
-                <span>Team Mgmt</span>
-              </Button>
-            </Link>
-            <Link href="/player-dashboard">
-              <Button variant="outline" size="sm" className="flex items-center space-x-1">
-                <UserCog className="h-4 w-4" />
-                <span>Player</span>
-              </Button>
-            </Link>
-          </div>
+
 
 
 
@@ -149,11 +172,11 @@ export function RedesignedHeader() {
 
                 <div className="space-y-2 border-t pt-4">
                   <h3 className="text-lg font-semibold">Authentication</h3>
-                  <Button variant="outline" className="w-full justify-start space-x-2">
+                  <Button variant="outline" className="w-full justify-start space-x-2" onClick={() => setIsMobileMenuOpen(false)}>
                     <LogIn className="h-4 w-4" />
                     <span>Sign In</span>
                   </Button>
-                  <Button className="w-full justify-start space-x-2 bg-blue-600 hover:bg-blue-700">
+                  <Button className="w-full justify-start space-x-2 bg-blue-600 hover:bg-blue-700" onClick={() => setIsMobileMenuOpen(false)}>
                     <UserCog className="h-4 w-4" />
                     <span>Sign Up</span>
                   </Button>
