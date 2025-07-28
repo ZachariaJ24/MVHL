@@ -266,6 +266,40 @@ export function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Team lineup routes
+  app.get("/api/teams/:teamId/lineup", async (req, res) => {
+    try {
+      const { teamId } = req.params;
+      const { gameId } = req.query;
+      const lineup = await storage.getTeamLineup(teamId, gameId as string);
+      res.json(lineup);
+    } catch (error) {
+      console.error("Error fetching team lineup:", error);
+      res.status(500).json({ error: "Failed to fetch team lineup" });
+    }
+  });
+
+  app.put("/api/teams/:teamId/lineup", async (req, res) => {
+    try {
+      const { teamId } = req.params;
+      const { lineup, playerAvailability, gameId } = req.body;
+      
+      const lineupData = await storage.updateTeamLineup(teamId, {
+        lineup,
+        playerAvailability,
+        gameId: gameId || null,
+        isActive: true,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      });
+      
+      res.json(lineupData);
+    } catch (error) {
+      console.error("Error updating team lineup:", error);
+      res.status(500).json({ error: "Failed to update team lineup" });
+    }
+  });
+
   // Draft routes
   app.get("/api/draft/picks", async (req, res) => {
     try {

@@ -159,7 +159,7 @@ export interface IStorage {
   // Team Lineup operations
   getTeamLineup(teamId: string, gameId?: string): Promise<any | undefined>;
   createTeamLineup(lineup: any): Promise<any>;
-  updateTeamLineup(id: string, updates: any): Promise<any>;
+  updateTeamLineup(teamId: string, lineupData: any): Promise<any>;
   
   // Player Availability operations
   // Player Availability
@@ -708,8 +708,14 @@ export class MemStorage implements IStorage {
     return { ...lineup, id };
   }
 
-  async updateTeamLineup(id: string, updates: any): Promise<any> {
-    return { id, ...updates };
+  async updateTeamLineup(teamId: string, lineupData: any): Promise<any> {
+    // For memory storage, just return the lineup data with an ID
+    return { 
+      id: `lineup-${teamId}`,
+      teamId,
+      ...lineupData,
+      updatedAt: new Date()
+    };
   }
 
   async getPlayerAvailability(teamId?: string, gameId?: string): Promise<any[]> {
@@ -1310,13 +1316,39 @@ export class DatabaseStorage implements IStorage {
     return created;
   }
 
-  async updateTeamLineup(id: string, updates: any): Promise<any> {
-    const [lineup] = await db
-      .update(teamLineups)
-      .set({ ...updates, updatedAt: new Date() })
-      .where(eq(teamLineups.id, id))
-      .returning();
-    return lineup;
+  async updateTeamLineup(teamId: string, lineupData: any): Promise<any> {
+    // First check if there's an existing active lineup for this team
+    const existing = await db.select().from(teamLineups)
+      .where(sql`${teamLineups.teamId} = ${teamId} AND ${teamLineups.isActive} = true AND ${teamLineups.gameId} IS NULL`)
+      .limit(1);
+    
+    if (existing.length > 0) {
+      // Update existing lineup
+      const [updated] = await db
+        .update(teamLineups)
+        .set({ 
+          lineup: lineupData.lineup,
+          playerAvailability: lineupData.playerAvailability,
+          updatedAt: new Date() 
+        })
+        .where(eq(teamLineups.id, existing[0].id))
+        .returning();
+      return updated;
+    } else {
+      // Create new lineup
+      const [created] = await db
+        .insert(teamLineups)
+        .values({
+          teamId,
+          lineup: lineupData.lineup,
+          playerAvailability: lineupData.playerAvailability,
+          isActive: true,
+          createdAt: new Date(),
+          updatedAt: new Date()
+        })
+        .returning();
+      return created;
+    }
   }
 
   // Player Availability operations
