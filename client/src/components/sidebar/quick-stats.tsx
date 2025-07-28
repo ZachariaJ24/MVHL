@@ -2,8 +2,14 @@ import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 
+interface QuickStatsData {
+  generated: number;
+  users: number;
+  reports: number;
+}
+
 export default function QuickStats() {
-  const { data: stats, isLoading } = useQuery({
+  const { data: stats, isLoading } = useQuery<QuickStatsData>({
     queryKey: ["/api/stats"],
   });
 
