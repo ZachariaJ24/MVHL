@@ -16,6 +16,7 @@ import { z } from "zod";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/use-auth";
+import { ChatMessage } from "@/components/ui/chat-message";
 
 const availabilitySchema = z.object({
   availability: z.enum(["available", "maybe", "unavailable"]),
@@ -88,10 +89,7 @@ export function PlayerDashboard() {
   });
 
   const updatePlayerMutation = useMutation({
-    mutationFn: (data: any) => apiRequest(`/api/players/${mockPlayer.id}`, {
-      method: "PATCH",
-      body: JSON.stringify(data),
-    }),
+    mutationFn: (data: any) => apiRequest("PATCH", `/api/players/${mockPlayer.id}`, data),
     onSuccess: () => {
       toast({ title: "Profile updated successfully" });
       setEditingProfile(false);
@@ -99,10 +97,7 @@ export function PlayerDashboard() {
   });
 
   const generateHeadshotMutation = useMutation({
-    mutationFn: (data: any) => apiRequest("/api/ai/player-headshot", {
-      method: "POST",
-      body: JSON.stringify(data),
-    }),
+    mutationFn: (data: any) => apiRequest("POST", "/api/ai/player-headshot", data),
     onSuccess: () => {
       toast({ title: "Headshot generated successfully" });
     },
@@ -571,9 +566,67 @@ export function PlayerDashboard() {
                 </div>
 
                 <div className="mt-4">
-                  <Button className="w-full">
-                    Save Availability Changes
-                  </Button>
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <Button className="w-full">
+                        Update Status
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                      <DialogHeader>
+                        <DialogTitle>Update Player Availability</DialogTitle>
+                        <DialogDescription>
+                          Set your availability status and update your bio
+                        </DialogDescription>
+                      </DialogHeader>
+                      <Form {...availabilityForm}>
+                        <form onSubmit={availabilityForm.handleSubmit(onUpdateAvailability)} className="space-y-4">
+                          <FormField
+                            control={availabilityForm.control}
+                            name="availability"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Availability Status</FormLabel>
+                                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                  <FormControl>
+                                    <SelectTrigger>
+                                      <SelectValue />
+                                    </SelectTrigger>
+                                  </FormControl>
+                                  <SelectContent>
+                                    <SelectItem value="available">Available</SelectItem>
+                                    <SelectItem value="maybe">Maybe</SelectItem>
+                                    <SelectItem value="unavailable">Unavailable</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                          <FormField
+                            control={availabilityForm.control}
+                            name="bio"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Player Bio</FormLabel>
+                                <FormControl>
+                                  <Textarea 
+                                    placeholder="Update your player bio..."
+                                    className="min-h-[100px]"
+                                    {...field} 
+                                  />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                          <Button type="submit" className="w-full" disabled={updatePlayerMutation.isPending}>
+                            {updatePlayerMutation.isPending ? "Updating..." : "Update Status"}
+                          </Button>
+                        </form>
+                      </Form>
+                    </DialogContent>
+                  </Dialog>
                 </div>
               </div>
             </CardContent>

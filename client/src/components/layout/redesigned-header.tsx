@@ -104,23 +104,68 @@ export function RedesignedHeader() {
               <DropdownMenuContent align="end" className="w-48">
                 <DropdownMenuLabel>Sign In As</DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem asChild>
-                  <Link href="/admin-dashboard" className="flex items-center space-x-2 cursor-pointer">
-                    <Settings className="h-4 w-4" />
-                    <span>Admin</span>
-                  </Link>
+                <DropdownMenuItem 
+                  className="flex items-center space-x-2 cursor-pointer"
+                  onClick={() => {
+                    const auth = JSON.parse(localStorage.getItem('mvhl_user') || 'null');
+                    if (!auth || auth.role !== 'admin') {
+                      localStorage.setItem('mvhl_user', JSON.stringify({
+                        id: 'admin-001',
+                        email: 'admin@mvhl.com',
+                        username: 'League Administrator',
+                        role: 'admin',
+                        teamId: null,
+                        playerId: null,
+                        createdAt: new Date(),
+                      }));
+                    }
+                    window.location.href = '/admin-dashboard';
+                  }}
+                >
+                  <Settings className="h-4 w-4" />
+                  <span>Admin</span>
                 </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link href="/management-dashboard" className="flex items-center space-x-2 cursor-pointer">
-                    <Building2 className="h-4 w-4" />
-                    <span>Team Manager</span>
-                  </Link>
+                <DropdownMenuItem 
+                  className="flex items-center space-x-2 cursor-pointer"
+                  onClick={() => {
+                    const auth = JSON.parse(localStorage.getItem('mvhl_user') || 'null');
+                    if (!auth || auth.role !== 'management') {
+                      localStorage.setItem('mvhl_user', JSON.stringify({
+                        id: 'mgmt-001',
+                        email: 'gm@mvhl.com',
+                        username: 'General Manager',
+                        role: 'management',
+                        teamId: 'd084d36c-b2da-44a7-8a67-eed5ec453082',
+                        playerId: null,
+                        createdAt: new Date(),
+                      }));
+                    }
+                    window.location.href = '/management-dashboard';
+                  }}
+                >
+                  <Building2 className="h-4 w-4" />
+                  <span>Team Manager</span>
                 </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link href="/player-dashboard" className="flex items-center space-x-2 cursor-pointer">
-                    <UserCog className="h-4 w-4" />
-                    <span>Player</span>
-                  </Link>
+                <DropdownMenuItem 
+                  className="flex items-center space-x-2 cursor-pointer"
+                  onClick={() => {
+                    const auth = JSON.parse(localStorage.getItem('mvhl_user') || 'null');
+                    if (!auth || auth.role !== 'player') {
+                      localStorage.setItem('mvhl_user', JSON.stringify({
+                        id: 'player-001',
+                        email: 'player@mvhl.com',
+                        username: 'Connor McDavid',
+                        role: 'player',
+                        teamId: 'd084d36c-b2da-44a7-8a67-eed5ec453082',
+                        playerId: 'player-001',
+                        createdAt: new Date(),
+                      }));
+                    }
+                    window.location.href = '/player-dashboard';
+                  }}
+                >
+                  <UserCog className="h-4 w-4" />
+                  <span>Player</span>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -162,24 +207,66 @@ export function RedesignedHeader() {
 
                 <div className="space-y-2 border-t pt-4">
                   <h3 className="text-lg font-semibold">Sign In As</h3>
-                  <Link href="/admin-dashboard">
-                    <Button variant="outline" className="w-full justify-start space-x-2" onClick={() => setIsMobileMenuOpen(false)}>
-                      <Settings className="h-4 w-4" />
-                      <span>Admin</span>
-                    </Button>
-                  </Link>
-                  <Link href="/management-dashboard">
-                    <Button variant="outline" className="w-full justify-start space-x-2" onClick={() => setIsMobileMenuOpen(false)}>
-                      <Building2 className="h-4 w-4" />
-                      <span>Team Manager</span>
-                    </Button>
-                  </Link>
-                  <Link href="/player-dashboard">
-                    <Button variant="outline" className="w-full justify-start space-x-2" onClick={() => setIsMobileMenuOpen(false)}>
-                      <UserCog className="h-4 w-4" />
-                      <span>Player</span>
-                    </Button>
-                  </Link>
+                  <Button 
+                    variant="outline" 
+                    className="w-full justify-start space-x-2" 
+                    onClick={() => {
+                      localStorage.setItem('mvhl_user', JSON.stringify({
+                        id: 'admin-001',
+                        email: 'admin@mvhl.com',
+                        username: 'League Administrator',
+                        role: 'admin',
+                        teamId: null,
+                        playerId: null,
+                        createdAt: new Date(),
+                      }));
+                      window.location.href = '/admin-dashboard';
+                      setIsMobileMenuOpen(false);
+                    }}
+                  >
+                    <Settings className="h-4 w-4" />
+                    <span>Admin</span>
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    className="w-full justify-start space-x-2" 
+                    onClick={() => {
+                      localStorage.setItem('mvhl_user', JSON.stringify({
+                        id: 'mgmt-001',
+                        email: 'gm@mvhl.com',
+                        username: 'General Manager',
+                        role: 'management',
+                        teamId: 'd084d36c-b2da-44a7-8a67-eed5ec453082',
+                        playerId: null,
+                        createdAt: new Date(),
+                      }));
+                      window.location.href = '/management-dashboard';
+                      setIsMobileMenuOpen(false);
+                    }}
+                  >
+                    <Building2 className="h-4 w-4" />
+                    <span>Team Manager</span>
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    className="w-full justify-start space-x-2" 
+                    onClick={() => {
+                      localStorage.setItem('mvhl_user', JSON.stringify({
+                        id: 'player-001',
+                        email: 'player@mvhl.com',
+                        username: 'Connor McDavid',
+                        role: 'player',
+                        teamId: 'd084d36c-b2da-44a7-8a67-eed5ec453082',
+                        playerId: 'player-001',
+                        createdAt: new Date(),
+                      }));
+                      window.location.href = '/player-dashboard';
+                      setIsMobileMenuOpen(false);
+                    }}
+                  >
+                    <UserCog className="h-4 w-4" />
+                    <span>Player</span>
+                  </Button>
                 </div>
 
 
