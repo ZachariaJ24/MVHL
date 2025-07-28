@@ -102,34 +102,24 @@ export function RedesignedHeader() {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-48">
-                <DropdownMenuLabel>Authentication</DropdownMenuLabel>
+                <DropdownMenuLabel>Sign In As</DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem className="flex items-center space-x-2 cursor-pointer">
-                  <LogIn className="h-4 w-4" />
-                  <span>Sign In</span>
-                </DropdownMenuItem>
-                <DropdownMenuItem className="flex items-center space-x-2 cursor-pointer">
-                  <UserCog className="h-4 w-4" />
-                  <span>Sign Up</span>
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuLabel>Quick Access</DropdownMenuLabel>
                 <DropdownMenuItem asChild>
                   <Link href="/admin-dashboard" className="flex items-center space-x-2 cursor-pointer">
                     <Settings className="h-4 w-4" />
-                    <span>Admin Panel</span>
+                    <span>Admin</span>
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
                   <Link href="/management-dashboard" className="flex items-center space-x-2 cursor-pointer">
                     <Building2 className="h-4 w-4" />
-                    <span>Team Management</span>
+                    <span>Team Manager</span>
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
                   <Link href="/player-dashboard" className="flex items-center space-x-2 cursor-pointer">
                     <UserCog className="h-4 w-4" />
-                    <span>Player Dashboard</span>
+                    <span>Player</span>
                   </Link>
                 </DropdownMenuItem>
               </DropdownMenuContent>
@@ -171,35 +161,23 @@ export function RedesignedHeader() {
                 </div>
 
                 <div className="space-y-2 border-t pt-4">
-                  <h3 className="text-lg font-semibold">Authentication</h3>
-                  <Button variant="outline" className="w-full justify-start space-x-2" onClick={() => setIsMobileMenuOpen(false)}>
-                    <LogIn className="h-4 w-4" />
-                    <span>Sign In</span>
-                  </Button>
-                  <Button className="w-full justify-start space-x-2 bg-blue-600 hover:bg-blue-700" onClick={() => setIsMobileMenuOpen(false)}>
-                    <UserCog className="h-4 w-4" />
-                    <span>Sign Up</span>
-                  </Button>
-                </div>
-
-                <div className="space-y-2 border-t pt-4">
-                  <h3 className="text-lg font-semibold">Panels</h3>
+                  <h3 className="text-lg font-semibold">Sign In As</h3>
                   <Link href="/admin-dashboard">
                     <Button variant="outline" className="w-full justify-start space-x-2" onClick={() => setIsMobileMenuOpen(false)}>
                       <Settings className="h-4 w-4" />
-                      <span>Admin Panel</span>
+                      <span>Admin</span>
                     </Button>
                   </Link>
                   <Link href="/management-dashboard">
                     <Button variant="outline" className="w-full justify-start space-x-2" onClick={() => setIsMobileMenuOpen(false)}>
                       <Building2 className="h-4 w-4" />
-                      <span>Team Management</span>
+                      <span>Team Manager</span>
                     </Button>
                   </Link>
                   <Link href="/player-dashboard">
                     <Button variant="outline" className="w-full justify-start space-x-2" onClick={() => setIsMobileMenuOpen(false)}>
                       <UserCog className="h-4 w-4" />
-                      <span>Player Panel</span>
+                      <span>Player</span>
                     </Button>
                   </Link>
                 </div>
